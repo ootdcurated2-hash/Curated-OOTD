@@ -45,6 +45,7 @@ const nunito = Nunito({
 });
 
 import InstallPwaPrompt from "@/components/InstallPwaPrompt";
+import SplashScreen from "@/components/SplashScreen";
 
 export default function RootLayout({
   children,
@@ -54,6 +55,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={`${nunito.variable} ${nunito.className} antialiased min-h-screen flex flex-col bg-background text-foreground`}>
+        <SplashScreen />
         <LayoutWrapper
           navbar={
             <Suspense fallback={<div className="h-[72px] w-full border-b border-border bg-white/60 backdrop-blur-xl" />}>
@@ -65,21 +67,6 @@ export default function RootLayout({
           {children}
         </LayoutWrapper>
         <InstallPwaPrompt />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                function purgeNetlify() {
-                  var els = document.querySelectorAll('netlify-drawer, #netlify-drawer, iframe[src*="netlify"], [data-netlify-drawer], [data-netlify-deploy-preview]');
-                  els.forEach(function(el) { el.remove(); });
-                }
-                purgeNetlify();
-                var observer = new MutationObserver(purgeNetlify);
-                observer.observe(document.documentElement, { childList: true, subtree: true });
-              })();
-            `,
-          }}
-        />
       </body>
     </html>
   );

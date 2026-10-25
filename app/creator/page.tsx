@@ -1,10 +1,10 @@
-import OutfitStudio from "@/components/OutfitStudio";
 import SkinToneAdvisor from "@/components/SkinToneAdvisor";
 import Link from "next/link";
+import { Bot } from "lucide-react";
 
 export default function CreatorPage() {
   return (
-    <main className="container max-w-7xl py-8 px-4 sm:px-6 space-y-12">
+    <main className="container max-w-5xl py-8 px-4 sm:px-6 space-y-10">
       <div className="space-y-1">
         <Link
           href="/"
@@ -14,22 +14,20 @@ export default function CreatorPage() {
         </Link>
         <div>
           <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-secondary text-foreground px-3 py-0.5 rounded-full border border-border shadow-cartoon-sm">
-            Studio Kreasi &amp; Styling Pribadi
+            <Bot className="h-3 w-3 text-primary" />
+            Konsultasi Gaya dengan AI
           </span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-black font-nunito tracking-tighter text-foreground pt-1">
-          Studio Padu Padan Outfit
+          Tanya AI Outfit ✨
         </h1>
         <p className="text-xs sm:text-sm font-semibold text-foreground/75 max-w-2xl leading-relaxed">
-          Kreasikan paduan busana pada kanvas interaktif dengan rujukan produk dan tautan pembelian resmi.
+          Tanyakan apa saja tentang outfit, warna busana, paduan gaya, atau rekomendasi berdasarkan warna kulit — AI siap membantu!
         </p>
       </div>
 
-      {/* Skin Tone Advisor */}
+      {/* AI Fashion Advisor */}
       <SkinToneAdvisor />
-
-      {/* Outfit Creator Studio */}
-      <OutfitStudio />
     </main>
   );
 }

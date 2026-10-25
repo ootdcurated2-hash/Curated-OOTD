@@ -215,62 +215,27 @@ export default function ProfileEditor({
           Pengaturan Akun &amp; Keamanan
         </h2>
         <p className="text-xs sm:text-sm font-bold text-foreground/70 mt-1">
-          Perbarui foto profil, nama tampilan, dan kata sandi akun Anda.
+          Perbarui nama tampilan, email, dan kata sandi akun Anda.
         </p>
       </div>
 
       <form onSubmit={handleSaveProfile} className="space-y-6">
-        {/* ── Foto Profil — hanya untuk admin ── */}
-        {isAdmin && (
-          <div className="flex flex-col sm:flex-row items-center gap-6 p-5 rounded-2xl bg-primary/5 border border-border shadow-cartoon-sm">
-            <div className="relative group">
-              <div className="h-24 w-24 rounded-2xl border border-border shadow-cartoon-sm flex items-center justify-center overflow-hidden bg-white">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
-                ) : (
-                  <User className="h-10 w-10 text-foreground/50" />
-                )}
-              </div>
-              <label
-                htmlFor="profile-avatar-upload"
-                className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50 text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
-              >
-                <Camera className="h-6 w-6 text-white" />
-              </label>
-              <input
-                id="profile-avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarChange}
-                className="hidden"
-              />
-            </div>
-            <div className="space-y-2 text-center sm:text-left">
-              <h3 className="font-black font-nunito text-sm sm:text-base text-foreground">Foto Profil</h3>
-              <p className="text-xs font-bold text-foreground/70">
-                Format JPG, PNG, atau WEBP. Ukuran file maksimal 5MB.
-              </p>
-              <div className="flex items-center gap-3 justify-center sm:justify-start">
-                <label
-                  htmlFor="profile-avatar-upload"
-                  className="inline-block text-xs font-black text-primary hover:underline cursor-pointer"
-                >
-                  Pilih Foto Baru
-                </label>
-                {avatarUrl && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    className="inline-flex items-center gap-1 text-xs font-black text-foreground/60 hover:text-primary transition-colors"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Hapus Foto
-                  </button>
-                )}
-              </div>
-            </div>
+        {/* ── Avatar Inisial (sama untuk semua akun / admin) ── */}
+        <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/30 border border-border">
+          <div className="h-14 w-14 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center shrink-0 shadow-cartoon-sm">
+            <span className="text-xl font-black text-primary leading-none">
+              {(displayName || email || "A").charAt(0).toUpperCase()}
+            </span>
           </div>
-        )}
+          <div>
+            <h3 className="font-black font-nunito text-sm sm:text-base text-foreground">
+              Avatar Profil
+            </h3>
+            <p className="text-xs font-bold text-foreground/70">
+              Avatar dibuat otomatis menggunakan huruf awal dari username atau email Anda.
+            </p>
+          </div>
+        </div>
 
         {/* ── Username & Email ── */}
         <div className="grid gap-4 sm:grid-cols-2">

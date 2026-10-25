@@ -63,17 +63,11 @@ export async function AuthButton() {
           className="touch-target flex items-center gap-2 text-primary font-medium hover:opacity-80 transition-opacity"
           aria-label={`Profil ${adminUsername}`}
         >
-          {adminAvatar ? (
-            <img
-              src={adminAvatar}
-              alt="Admin"
-              className="h-8 w-8 sm:h-7 sm:w-7 rounded-full object-cover border border-primary/30"
-            />
-          ) : (
-            <div className="h-8 w-8 sm:h-7 sm:w-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-          )}
+          <div className="h-8 w-8 sm:h-7 sm:w-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/30 shrink-0">
+            <span className="text-xs font-black text-primary leading-none">
+              {(adminUsername || "A").charAt(0).toUpperCase()}
+            </span>
+          </div>
           <span className="hidden md:inline max-w-[88px] truncate">{adminUsername}</span>
         </Link>
         <LogoutButton compact />

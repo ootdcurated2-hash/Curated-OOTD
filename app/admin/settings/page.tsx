@@ -18,7 +18,7 @@ export default async function AdminSettingsPage() {
               Pengaturan Profil Admin
             </h1>
             <p className="text-xs sm:text-sm font-bold text-foreground/70 mt-0.5">
-              Ubah username, email, foto profil, dan kata sandi akun administrator.
+              Ubah username, email, dan kata sandi akun administrator.
             </p>
           </div>
         </div>

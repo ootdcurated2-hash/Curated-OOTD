@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, PlusCircle, Brush } from "lucide-react";
+import { Heart, PlusCircle, Bot } from "lucide-react";
 import { AuthButton } from "./auth-button";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
@@ -39,11 +39,11 @@ export default async function Navbar() {
           <GuestGuardLink
             href="/creator"
             isLoggedIn={isLoggedIn}
-            aria-label="Kreasi Outfit"
+            aria-label="Tanya AI"
             className="touch-target flex items-center justify-center gap-2 p-2.5 sm:px-4 sm:py-2 rounded-full border border-border bg-white text-xs font-black text-foreground shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all"
           >
-            <Brush className="h-4 w-4 text-accent shrink-0" />
-            <span className="hidden md:inline">Kreasi Outfit</span>
+            <Bot className="h-4 w-4 text-primary shrink-0" />
+            <span className="hidden md:inline">Tanya AI</span>
           </GuestGuardLink>
 
           <GuestGuardLink

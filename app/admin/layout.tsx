@@ -103,17 +103,11 @@ export default async function AdminLayout({
                 className="flex items-center gap-2 min-w-0 rounded-full pr-2 hover:bg-secondary/60 transition-colors"
                 title="Pengaturan profil admin"
               >
-                {adminAvatar ? (
-                  <img
-                    src={adminAvatar}
-                    alt={adminDisplayName}
-                    className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 rounded-full object-cover border-2 border-primary/30 shadow-cartoon-sm"
-                  />
-                ) : (
-                  <div className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                    <ShieldCheck className="h-4 w-4 text-primary" />
-                  </div>
-                )}
+                <div className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/30 shadow-cartoon-sm">
+                  <span className="text-xs sm:text-sm font-black text-primary leading-none">
+                    {(adminDisplayName || adminEmail || "A").charAt(0).toUpperCase()}
+                  </span>
+                </div>
                 <div className="min-w-0 leading-tight">
                   <p className="text-xs sm:text-sm font-black text-foreground truncate max-w-[120px] sm:max-w-[200px]">
                     {adminDisplayName}
