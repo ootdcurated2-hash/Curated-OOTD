@@ -14,7 +14,7 @@ interface HomeClientProps {
   isLoggedIn?: boolean;
 }
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 5;
 
 export default function HomeClient({ outfits, isLoggedIn = false }: HomeClientProps) {
   const [activeGender, setActiveGender] = useState("all");

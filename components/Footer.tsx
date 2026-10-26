@@ -141,13 +141,15 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="panel-3d w-full border-t border-border bg-white/50 backdrop-blur-xl">
+      <footer className="w-full border-t border-border/80 bg-white/80 backdrop-blur-xl relative">
+        {/* Delicate warm rose accent line */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="container max-w-7xl py-10 sm:py-16 px-4 sm:px-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-12 pb-8 sm:pb-12 border-b border-border">
             {/* Logo & Deskripsi */}
             <div className="text-center lg:text-left space-y-4 max-w-md">
               <Link href="/" className="inline-flex items-center gap-3 group">
-                <div className="h-14 w-14 rounded-[1.25rem] border border-border bg-white p-2 shadow-cartoon-sm transition-all duration-300 group-hover:rotate-6 group-hover:scale-110">
+                <div className="icon-3d h-14 w-14 rounded-2xl border border-border bg-white p-2 shadow-cartoon-sm transition-all duration-300 group-hover:rotate-6 group-hover:scale-110">
                   <img
                     src="/logo-icon.png"
                     alt="Curated OOTD Logo"

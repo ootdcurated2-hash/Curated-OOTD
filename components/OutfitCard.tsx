@@ -104,16 +104,18 @@ export default function OutfitCard({ outfit, isLoggedIn: initialIsLoggedIn, onSe
   })();
 
   return (
-    <div className="group relative overflow-hidden cartoon-card bg-white/60 backdrop-blur-xl transition-all duration-500 border-white/40">
+    <div className="outfit-card group relative overflow-hidden cartoon-card bg-white/75 backdrop-blur-xl transition-all duration-300 border-border hover:shadow-cartoon-lg hover:-translate-y-1">
       <div className="relative">
-        <GuestGuardLink href={`/outfit/${outfit.id}`} isLoggedIn={isAuth === true} className="block">
+        <GuestGuardLink href={`/outfit/${outfit.id}`} isLoggedIn={isAuth === true} className="block overflow-hidden">
           <div className="relative aspect-[4/5] w-full overflow-hidden bg-primary/5 border-b border-border">
             <img
               src={outfit.image_url}
               alt={outfit.title}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="outfit-card-img h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
               loading="lazy"
             />
+            {/* Elegant gradient overlay on hover */}
+            <div className="outfit-card-overlay" />
           </div>
         </GuestGuardLink>
 
@@ -123,10 +125,10 @@ export default function OutfitCard({ outfit, isLoggedIn: initialIsLoggedIn, onSe
           onClick={toggleWishlist}
           aria-label={liked ? "Hapus dari Favorit" : "Simpan ke Favorit"}
           aria-pressed={liked}
-          className={`group/btn absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-20 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border shadow-md backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-90 ${
+          className={`group/btn absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-20 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border shadow-md backdrop-blur-md transition-all duration-300 hover:scale-115 active:scale-90 ${
             liked
-              ? "border-pink-300 bg-white/95 text-primary shadow-pink-500/25 ring-2 ring-primary/20"
-              : "border-white/80 bg-white/90 text-foreground/60 hover:text-primary hover:border-pink-200 hover:bg-white shadow-black/15"
+              ? "border-pink-300 bg-white/95 text-primary shadow-pink-500/25 ring-2 ring-primary/20 scale-105"
+              : "border-white/80 bg-white/85 text-foreground/60 hover:text-primary hover:border-pink-200 hover:bg-white shadow-black/15"
           }`}
         >
           <Heart
@@ -140,24 +142,24 @@ export default function OutfitCard({ outfit, isLoggedIn: initialIsLoggedIn, onSe
       </div>
 
       <GuestGuardLink href={`/outfit/${outfit.id}`} isLoggedIn={isAuth === true} className="block">
-        <div className="p-5 sm:p-6 space-y-3">
+        <div className="p-4 sm:p-5 space-y-2.5">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="line-clamp-1 font-black text-lg text-foreground font-nunito tracking-tight group-hover:text-primary transition-colors duration-300">
+            <h3 className="line-clamp-1 font-black text-base sm:text-lg text-foreground font-nunito tracking-tight group-hover:text-primary transition-colors duration-300">
               {outfit.title}
             </h3>
             {priceDisplay && (
-              <span className="shrink-0 rounded-xl bg-primary/10 border border-primary/20 px-2.5 py-1 text-xs font-black text-primary font-nunito shadow-xs">
+              <span className="shrink-0 rounded-xl bg-primary/10 border border-primary/20 px-2 py-0.5 text-xs font-black text-primary font-nunito shadow-xs">
                 {priceDisplay}
               </span>
             )}
           </div>
           {outfit.description && (
-            <p className="line-clamp-2 text-xs font-bold text-foreground/50 leading-relaxed">
+            <p className="line-clamp-2 text-xs font-semibold text-foreground/60 leading-relaxed">
               {outfit.description}
             </p>
           )}
           {outfit.tags && outfit.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-wrap gap-1.5 pt-1">
               {outfit.tags.map((tag) => (
                 <button
                   key={tag}
@@ -169,7 +171,7 @@ export default function OutfitCard({ outfit, isLoggedIn: initialIsLoggedIn, onSe
                       onSelectTag(tag);
                     }
                   }}
-                  className={`rounded-full border border-border bg-white/80 px-3 py-1 text-[9px] font-black text-foreground/60 shadow-sm uppercase tracking-widest transition-all ${
+                  className={`rounded-full border border-border/80 bg-white/90 px-2.5 py-0.5 text-[9px] font-black text-foreground/70 shadow-cartoon-sm uppercase tracking-wider transition-all ${
                     onSelectTag
                       ? "hover:border-primary/50 hover:bg-primary/10 hover:text-primary cursor-pointer active:scale-95"
                       : ""

@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { isUserAdmin } from "@/lib/admin";
 import GuestGuardLink from "./GuestGuardLink";
 
+import NavbarClientWrapper from "./NavbarClientWrapper";
+
 export default async function Navbar() {
   const cookieStore = await cookies();
   const hasAdminCookie = cookieStore.get("admin_session")?.value === "adminootd_authenticated";
@@ -18,8 +20,8 @@ export default async function Navbar() {
   const isLoggedIn = !!user || hasAdminCookie;
 
   return (
-    <header className="panel-3d sticky top-0 z-50 w-full border-b border-border bg-white/70 backdrop-blur-xl pt-[env(safe-area-inset-top,0px)]">
-      <div className="container flex h-14 sm:h-20 max-w-7xl items-center justify-between gap-2 px-3 sm:px-8 min-w-0">
+    <NavbarClientWrapper>
+      <div className="container flex h-14 sm:h-20 max-w-7xl items-center justify-between gap-2 px-3 sm:px-8 min-w-0 transition-all">
         <Link href="/" className="flex shrink-0 items-center gap-1.5 sm:gap-2.5 group">
           <div className="icon-3d h-8 w-8 sm:h-12 sm:w-12 shrink-0 rounded-xl sm:rounded-[1.25rem] border border-border bg-white p-1 sm:p-2 shadow-cartoon-sm transition-all duration-300 group-hover:rotate-6 group-hover:scale-110">
             <img src="/logo-icon.png" alt="My Curated OOTD Logo" className="h-full w-full object-contain" />
@@ -71,6 +73,6 @@ export default async function Navbar() {
           <AuthButton />
         </nav>
       </div>
-    </header>
+    </NavbarClientWrapper>
   );
 }

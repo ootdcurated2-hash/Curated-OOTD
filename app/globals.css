@@ -28,32 +28,32 @@ div[class*="netlify-drawer"],
 
 @layer base {
   :root {
-    /* Palet Gen Z Pink — Bright, Vibrant, Bold, Modern */
-    --background: 330 100% 99%; /* #FFFAFC Ultra Light Pink */
-    --foreground: 330 30% 15%; /* #321A28 Deep Plum */
+    /* Palet Estetika Fashion Wanita — Chic, Warm Rose & Soft Cream (Human-Curated) */
+    --background: 340 35% 98.5%; /* #FAF6F7 Warm Soft Rose Cream */
+    --foreground: 335 25% 18%; /* #37232C Rich Espresso Plum */
     --card: 0 0% 100%;
-    --card-foreground: 330 30% 15%;
+    --card-foreground: 335 25% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 330 30% 15%;
-    --primary: 330 100% 65%; /* #FF4FA8 Bright Pink */
+    --popover-foreground: 335 25% 18%;
+    --primary: 340 75% 58%; /* #E84A78 Elegant Rose Mauve */
     --primary-foreground: 0 0% 100%;
-    --secondary: 330 100% 94%; /* #FFE0EE Bright Pastel Pink */
-    --secondary-foreground: 330 100% 32%;
-    --muted: 330 60% 97%;
-    --muted-foreground: 330 20% 45%;
-    --accent: 190 100% 45%; /* #00CCFF Electric Blue / Cyan */
+    --secondary: 340 50% 95%; /* #FBF0F3 Gentle Petal Pink */
+    --secondary-foreground: 340 60% 32%;
+    --muted: 340 25% 96%;
+    --muted-foreground: 335 15% 45%;
+    --accent: 175 45% 42%; /* #3B9B94 Warm Sage / Muted Teal */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 330 100% 92%; /* #FFD6E6 Soft Pink Border */
-    --input: 330 100% 92%;
-    --ring: 330 100% 65%;
-    --chart-1: 330 100% 65%;
-    --chart-2: 190 100% 45%;
-    --chart-3: 280 100% 70%;
-    --chart-4: 45 100% 65%;
-    --chart-5: 160 100% 45%;
-    --radius: 2rem;
+    --border: 340 30% 92%; /* #F5E8ED Delicate Rose Border */
+    --input: 340 30% 92%;
+    --ring: 340 75% 58%;
+    --chart-1: 340 75% 58%;
+    --chart-2: 175 45% 42%;
+    --chart-3: 280 45% 65%;
+    --chart-4: 35 75% 58%;
+    --chart-5: 160 40% 48%;
+    --radius: 1.5rem;
   }
   .dark {
     /* Mode gelap Gen Z — Cyberpunk/Neon vibes */
@@ -299,6 +299,270 @@ div[class*="netlify-drawer"],
     min-width: 2.75rem;
   }
 
+  /* ════════════════════════════════════════════════════
+     SCROLL REVEAL — intersection observer driven
+     ════════════════════════════════════════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal-left.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(32px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal-right.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.92);
+    transition:
+      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal-scale.is-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Stagger delays for children */
+  .stagger-1 { transition-delay: 0.05s; }
+  .stagger-2 { transition-delay: 0.1s; }
+  .stagger-3 { transition-delay: 0.15s; }
+  .stagger-4 { transition-delay: 0.2s; }
+  .stagger-5 { transition-delay: 0.25s; }
+  .stagger-6 { transition-delay: 0.3s; }
+  .stagger-7 { transition-delay: 0.35s; }
+  .stagger-8 { transition-delay: 0.4s; }
+
+  /* ════════════════════════════════════════════════════
+     TILT 3D — JS-powered, CSS vars set inline
+     ════════════════════════════════════════════════════ */
+  .tilt-3d {
+    transform-style: preserve-3d;
+    transform:
+      perspective(900px)
+      rotateX(var(--tilt-x, 0deg))
+      rotateY(var(--tilt-y, 0deg));
+    transition: transform 0.15s ease;
+    will-change: transform;
+  }
+
+  .tilt-3d-content {
+    transform: translateZ(20px);
+    transition: transform 0.15s ease;
+  }
+
+  /* ════════════════════════════════════════════════════
+     SHIMMER — animated highlight for buttons/cards
+     ════════════════════════════════════════════════════ */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 65%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-slide 2.2s ease-in-out infinite;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* ════════════════════════════════════════════════════
+     GRADIENT TEXT — Chic Rose, Mauve & Warm Berry
+     ════════════════════════════════════════════════════ */
+  .gradient-text {
+    background: linear-gradient(135deg, #D93B68 0%, #E85D88 50%, #C44569 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-warm {
+    background: linear-gradient(135deg, #D93B68 0%, #EA7A60 60%, #E5A35C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ════════════════════════════════════════════════════
+     GLOW EFFECTS — Soft & Natural
+     ════════════════════════════════════════════════════ */
+  .glow-primary {
+    box-shadow: 0 4px 20px rgba(232, 74, 120, 0.25);
+  }
+
+  .glow-accent {
+    box-shadow: 0 4px 20px rgba(59, 155, 148, 0.2);
+  }
+
+  .text-glow {
+    text-shadow: 0 2px 10px rgba(232, 74, 120, 0.2);
+  }
+
+  /* ════════════════════════════════════════════════════
+     FLOATING BADGE — for hero decorative labels
+     ════════════════════════════════════════════════════ */
+  .badge-float {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 4px 16px rgba(255, 79, 168, 0.18),
+      0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  }
+
+  /* ════════════════════════════════════════════════════
+     ANIMATED BORDER GRADIENT
+     ════════════════════════════════════════════════════ */
+  .border-gradient {
+    position: relative;
+  }
+
+  .border-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(135deg, #E84A78, #F4A261, #E84A78);
+    background-size: 200% 200%;
+    animation: gradient-border-move 3s ease-in-out infinite;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* ════════════════════════════════════════════════════
+     HERO BACKGROUND MESH — Warm Soft Boutique Atmosphere
+     ════════════════════════════════════════════════════ */
+  .hero-mesh {
+    background:
+      radial-gradient(at 20% 15%, rgba(232, 74, 120, 0.08) 0px, transparent 50%),
+      radial-gradient(at 80% 10%, rgba(244, 162, 97, 0.06) 0px, transparent 45%),
+      radial-gradient(at 50% 80%, rgba(200, 125, 184, 0.06) 0px, transparent 50%);
+  }
+
+  /* ════════════════════════════════════════════════════
+     ADMIN — styled scrollbar, header, etc.
+     ════════════════════════════════════════════════════ */
+  .admin-nav-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
+    box-shadow: 0 2px 6px rgba(255, 79, 168, 0.08);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .admin-nav-link:hover {
+    background: hsl(var(--secondary));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 79, 168, 0.15);
+  }
+
+  .admin-nav-link.active {
+    background: hsl(var(--primary));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(255, 79, 168, 0.38);
+  }
+
+  /* ════════════════════════════════════════════════════
+     STAT CARD — animated number counter
+     ════════════════════════════════════════════════════ */
+  .stat-number {
+    background: linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--primary)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: counter-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* ════════════════════════════════════════════════════
+     OUTFIT CARD — enhanced
+     ════════════════════════════════════════════════════ */
+  .outfit-card-img {
+    transition: transform 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .outfit-card:hover .outfit-card-img {
+    transform: scale(1.08);
+  }
+
+  .outfit-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(50, 26, 40, 0.45) 0%,
+      rgba(50, 26, 40, 0.1) 40%,
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: inherit;
+  }
+
+  .outfit-card:hover .outfit-card-overlay {
+    opacity: 1;
+  }
+
+  /* ════════════════════════════════════════════════════
+     RESPONSIVE ADJUSTMENTS
+     ════════════════════════════════════════════════════ */
   @media (max-width: 640px) {
     .section-padding {
       padding-top: 2.5rem;
@@ -321,9 +585,16 @@ div[class*="netlify-drawer"],
     .shape-3d-ring {
       display: none;
     }
+
+    .tilt-3d {
+      transform: none !important;
+    }
   }
 }
 
+/* ══════════════════════════════════════════════════════════
+   HOVER — disable on touch devices
+   ══════════════════════════════════════════════════════════ */
 @media (hover: none) and (pointer: coarse) {
   .cartoon-card:hover {
     transform: none;
@@ -332,9 +603,19 @@ div[class*="netlify-drawer"],
   .cartoon-btn:hover {
     transform: none;
   }
+
+  .tilt-3d {
+    transform: none !important;
+  }
+
+  .shimmer::after {
+    display: none;
+  }
 }
 
-/* Custom keyframe animations */
+/* ══════════════════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ══════════════════════════════════════════════════════════ */
 @keyframes wiggle {
   0%, 100% { transform: rotate(-3deg); }
   50% { transform: rotate(3deg); }
@@ -388,6 +669,63 @@ div[class*="netlify-drawer"],
   }
 }
 
+@keyframes shimmer-slide {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes gradient-border-move {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes counter-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes hero-badge-float {
+  0%, 100% { transform: translateY(0px) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@keyframes hero-badge-float-2 {
+  0%, 100% { transform: translateY(0px) rotate(2deg); }
+  50% { transform: translateY(-6px) rotate(-1deg); }
+}
+
+@keyframes hero-entry {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes text-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0 0% 0 0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(255, 79, 168, 0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(255, 79, 168, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 79, 168, 0); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ANIMATION UTILITY CLASSES
+   ══════════════════════════════════════════════════════════ */
 .animate-wiggle {
   animation: wiggle 2s ease-in-out infinite;
 }
@@ -414,6 +752,38 @@ div[class*="netlify-drawer"],
 
 .animate-bounce-x {
   animation: bounce-x 1s ease-in-out infinite;
+}
+
+.animate-hero-badge {
+  animation: hero-badge-float 4s ease-in-out infinite;
+}
+
+.animate-hero-badge-2 {
+  animation: hero-badge-float-2 3.5s ease-in-out infinite 0.6s;
+}
+
+.animate-hero-entry {
+  animation: hero-entry 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-hero-entry-delay-1 {
+  animation: hero-entry 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.animate-hero-entry-delay-2 {
+  animation: hero-entry 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+.animate-hero-entry-delay-3 {
+  animation: hero-entry 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+.animate-hero-entry-delay-4 {
+  animation: hero-entry 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
 }
 
 /* —— Dekorasi scene 3D (background) —— */
@@ -508,6 +878,9 @@ div[class*="netlify-drawer"],
   animation: spin-3d 18s linear infinite;
 }
 
+/* ══════════════════════════════════════════════════════════
+   PREFERS-REDUCED-MOTION
+   ══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   .cartoon-card:hover {
     transform: translateY(-6px);
@@ -523,8 +896,51 @@ div[class*="netlify-drawer"],
   .shape-3d-ring {
     animation: none;
   }
+
+  .shimmer::after {
+    animation: none;
+  }
+
+  .animate-wiggle,
+  .animate-float,
+  .animate-float-delay,
+  .animate-float-delay-2,
+  .animate-pop,
+  .animate-spin-slow,
+  .animate-bounce-x,
+  .animate-hero-badge,
+  .animate-hero-badge-2,
+  .animate-pulse-ring {
+    animation: none;
+  }
+
+  .animate-hero-entry,
+  .animate-hero-entry-delay-1,
+  .animate-hero-entry-delay-2,
+  .animate-hero-entry-delay-3,
+  .animate-hero-entry-delay-4 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .tilt-3d {
+    transform: none !important;
+  }
 }
 
+/* ══════════════════════════════════════════════════════════
+   BASE LAYER
+   ══════════════════════════════════════════════════════════ */
 @layer base {
   * {
     box-sizing: border-box;
@@ -543,14 +959,15 @@ div[class*="netlify-drawer"],
     padding-left: env(safe-area-inset-left, 0);
     padding-right: env(safe-area-inset-right, 0);
     padding-bottom: env(safe-area-inset-bottom, 0);
-    /* Mesh Gradient Gen Z — Vibrant, Fluid, Modern */
+    /* Enhanced Mesh Gradient Gen Z — Vibrant, Fluid, Modern */
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(at 0% 0%, rgba(255, 79, 168, 0.2) 0px, transparent 52%),
-      radial-gradient(at 100% 0%, rgba(0, 204, 255, 0.12) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(255, 204, 0, 0.12) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(200, 125, 184, 0.12) 0px, transparent 50%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 28%, transparent 72%, rgba(255, 232, 244, 0.25) 100%);
+      radial-gradient(at 0% 0%, rgba(255, 79, 168, 0.18) 0px, transparent 52%),
+      radial-gradient(at 100% 0%, rgba(0, 204, 255, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(255, 204, 0, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(200, 125, 184, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(255, 79, 168, 0.04) 0px, transparent 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 28%, transparent 72%, rgba(255, 232, 244, 0.22) 100%);
     background-attachment: fixed;
   }
 
@@ -561,8 +978,8 @@ div[class*="netlify-drawer"],
 
   /* Scrollbar Gen Z: Neon & Slim */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   ::-webkit-scrollbar-track {
@@ -570,7 +987,7 @@ div[class*="netlify-drawer"],
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #FF4FA8;
+    background: linear-gradient(180deg, #FF4FA8, #FF8BC0);
     border-radius: 9999px;
   }
 

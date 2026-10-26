@@ -35,13 +35,20 @@ export const metadata: Metadata = {
   },
 };
 
-import { Nunito } from "next/font/google";
+import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
 
 const nunito = Nunito({
   variable: "--font-nunito",
   display: "swap",
   subsets: ["latin"],
   weight: ["400", "600", "700", "800", "900"],
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  display: "swap",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 import InstallPwaPrompt from "@/components/InstallPwaPrompt";
@@ -54,7 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${nunito.variable} ${nunito.className} antialiased min-h-screen flex flex-col bg-background text-foreground`}>
+      <body className={`${nunito.variable} ${jakarta.variable} ${jakarta.className} antialiased min-h-screen flex flex-col bg-background text-foreground`}>
         <SplashScreen />
         <LayoutWrapper
           navbar={

@@ -10,6 +10,10 @@ import { Review, REVIEW_COLUMNS } from "@/lib/reviews";
 import { Brush } from "lucide-react";
 import { normalizeOutfitItems } from "@/lib/outfitItems";
 
+import TiltCard from "@/components/TiltCard";
+import ScrollReveal from "@/components/ScrollReveal";
+import { Sparkles, Compass, Wand2 } from "lucide-react";
+
 export default async function Home() {
   const cookieStore = await cookies();
   const hasAdminCookie = cookieStore.get("admin_session")?.value === "adminootd_authenticated";
@@ -41,127 +45,142 @@ export default async function Home() {
   const currentUserId = (user as any)?.sub ?? null;
 
   return (
-    <main className="container mx-auto max-w-7xl py-3 sm:py-8 px-3 sm:px-6 space-y-5 sm:space-y-8 w-full min-w-0">
-      {/* ====  Hero Section — tanpa kotak, rata tengah atas ==== */}
-      <section className="mx-auto w-full max-w-2xl pt-1 sm:pt-4 pb-1 text-center flex flex-col items-center justify-start gap-3 sm:gap-5 px-1">
-        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[9px] sm:text-xs font-black uppercase tracking-wide sm:tracking-[0.2em] text-foreground/50 leading-snug max-w-[320px] sm:max-w-none">
-          <img
-            src="/logo-icon.png"
-            alt=""
-            className="h-4 w-4 object-contain opacity-80"
-            aria-hidden
-          />
-          <span>Kurasi Premium</span>
-          <span className="text-foreground/30 hidden sm:inline" aria-hidden>·</span>
-          <span>Vibe Gen Z</span>
-          <span className="text-foreground/30" aria-hidden>·</span>
-          <span>Inspirasi Harian</span>
-        </p>
-
-        <div className="space-y-2.5 sm:space-y-4 w-full">
-          <h1 className="text-[1.65rem] leading-tight font-black tracking-tight sm:text-4xl md:text-[2.75rem] text-foreground font-nunito text-balance px-1">
-            Tingkatkan{" "}
-            <span className="text-primary italic">Gaya Kamu</span>
-          </h1>
-          <p className="text-sm sm:text-base font-semibold text-muted-foreground max-w-lg mx-auto leading-relaxed text-balance">
-            Jelajahi inspirasi outfit harian, padu padan gaya di Studio, dan belanja gaya terbaik secara langsung.
+    <main className="container mx-auto max-w-7xl py-5 sm:py-12 px-3 sm:px-6 space-y-8 sm:space-y-12 w-full min-w-0">
+      {/* ====  Hero Section — Chic Feminine Editorial Style ==== */}
+      <section className="relative mx-auto w-full max-w-3xl pt-4 sm:pt-8 pb-3 text-center flex flex-col items-center justify-start gap-4 sm:gap-6 px-3">
+        {/* Subtle Brand Tagline */}
+        <div className="animate-hero-entry">
+          <p className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-pink-100 shadow-cartoon-sm text-[11px] sm:text-xs font-semibold tracking-wide text-foreground/75">
+            <img
+              src="/logo-icon.png"
+              alt=""
+              className="h-3.5 w-3.5 object-contain"
+              aria-hidden
+            />
+            <span className="font-bold text-primary">Inspirasi Outfit Pilihan</span>
+            <span className="text-foreground/30" aria-hidden>•</span>
+            <span>Gaya Sehari-hari</span>
+            <span className="text-foreground/30 hidden xs:inline" aria-hidden>•</span>
+            <span className="hidden xs:inline">Padu Padan Mudah</span>
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-3 w-full sm:w-auto pt-1 max-w-sm sm:max-w-none mx-auto">
+        {/* Headline — Natural, Elegant, Human-Curated */}
+        <div className="space-y-3 sm:space-y-4 w-full">
+          <h1 className="animate-hero-entry delay-1 text-3xl sm:text-5xl md:text-[3.5rem] font-bold tracking-tight font-jakarta leading-[1.15] text-foreground text-balance">
+            Temukan Sentuhan{" "}
+            <span className="text-primary italic font-serif font-normal">Gaya Terbaikmu</span>{" "}
+            Setiap Hari
+          </h1>
+          <p className="animate-hero-entry delay-2 text-sm sm:text-base font-normal text-foreground/70 max-w-xl mx-auto leading-relaxed text-balance">
+            Kurasi busana kasual, kantor, hingga hangout untuk wanita. Coba paduan outfit di Studio Kreasi dan temukan warna yang paling pas untukmu.
+          </p>
+        </div>
+
+        {/* CTA Buttons — Elegant, warm, tactile */}
+        <div className="animate-hero-entry delay-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto pt-2 max-w-sm sm:max-w-none mx-auto">
           <GuestGuardLink
             href="/creator"
             isLoggedIn={isLoggedIn}
-            className="cartoon-btn touch-target bg-primary text-white px-6 py-3 sm:py-2.5 text-sm text-center shadow-cartoon-sm min-h-[44px] flex items-center justify-center"
+            className="cartoon-btn touch-target bg-primary hover:bg-primary/95 text-white font-bold px-7 py-3.5 sm:py-3 text-sm text-center shadow-cartoon hover:scale-102 active:scale-98 transition-all min-h-[48px] flex items-center justify-center gap-2 rounded-full"
           >
-            Mulai Berkarya
+            <Wand2 className="w-4 h-4" />
+            <span>Mulai Padu Padan</span>
           </GuestGuardLink>
           <GuestGuardLink
             href="/creator#advisor"
             isLoggedIn={isLoggedIn}
-            className="cartoon-btn touch-target bg-white/90 text-foreground border border-border px-6 py-3 sm:py-2.5 text-sm text-center shadow-cartoon-sm min-h-[44px] flex items-center justify-center"
+            className="cartoon-btn touch-target bg-white/95 hover:bg-white text-foreground border border-pink-100 font-bold px-7 py-3.5 sm:py-3 text-sm text-center shadow-cartoon-sm hover:scale-102 active:scale-98 transition-all min-h-[48px] flex items-center justify-center gap-2 rounded-full"
           >
-            Panduan Warna Kulit
+            <Compass className="w-4 h-4 text-primary" />
+            <span>Cek Warna Kulit</span>
           </GuestGuardLink>
         </div>
       </section>
 
-      {/* ====  Feature Cards  ==== */}
-      <div className={`grid grid-cols-1 ${isAdmin ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-5 sm:gap-6`}>
-        <GuestGuardLink
-          href="/creator"
-          isLoggedIn={isLoggedIn}
-          className="group cartoon-card bg-white/60 p-5 sm:p-7 flex flex-col justify-between hover:bg-white/80 transition-all border-white/40 shadow-cartoon-sm"
-        >
-          <div className="space-y-6">
-            <div className="icon-3d h-14 w-14 rounded-3xl border border-border bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-12 group-hover:scale-110 transition-all">
-              <Brush className="h-7 w-7" />
-            </div>
-            <div>
-              <h3 className="font-black text-xl sm:text-2xl text-foreground font-nunito tracking-tight">
-                Studio Kreasi
-              </h3>
-              <p className="mt-2 text-sm font-bold text-foreground/60 leading-relaxed">
-                Padu padan atasan, bawahan, dan aksesori dengan warna favorit Anda di ruang 3D yang modern.
-              </p>
-            </div>
-          </div>
-          <span className="text-sm font-black text-primary mt-8 inline-flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-            Coba Studio &rarr;
-          </span>
-        </GuestGuardLink>
-
-        <GuestGuardLink
-          href="/creator#advisor"
-          isLoggedIn={isLoggedIn}
-          className="group cartoon-card bg-white/60 p-5 sm:p-7 flex flex-col justify-between hover:bg-white/80 transition-all border-white/40 shadow-cartoon-sm"
-        >
-          <div className="space-y-6">
-            <div className="icon-3d h-14 w-14 rounded-3xl border border-border bg-accent/10 flex items-center justify-center text-accent group-hover:-rotate-12 group-hover:scale-110 transition-all">
-              <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 21a4 4 0 01-4-4 4 4 0 014-4h4a4 4 0 014 4 4 4 0 01-4 4H7zm10-10a4 4 0 100-8 4 4 0 000 8zm-8-3a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-black text-xl sm:text-2xl text-foreground font-nunito tracking-tight">
-                Analisis Warna Pribadi
-              </h3>
-              <p className="mt-2 text-sm font-bold text-foreground/60 leading-relaxed">
-                Dapatkan rekomendasi warna berbasis AI yang paling cocok dengan warna kulit unik Anda.
-              </p>
-            </div>
-          </div>
-          <span className="text-sm font-black text-accent mt-8 inline-flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-            Analisis Sekarang &rarr;
-          </span>
-        </GuestGuardLink>
-
-        {isAdmin && (
-          <Link
-            href="/admin/categories"
-            className="group cartoon-card bg-white/60 p-5 sm:p-7 flex flex-col justify-between hover:bg-white/80 transition-all border-white/40 shadow-cartoon-sm"
+      {/* ====  Feature Cards with 3D Physics Tilt & Scroll Reveal  ==== */}
+      <ScrollReveal className={`grid grid-cols-1 ${isAdmin ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-5 sm:gap-6`}>
+        <TiltCard className="reveal stagger-1 h-full">
+          <GuestGuardLink
+            href="/creator"
+            isLoggedIn={isLoggedIn}
+            className="group cartoon-card bg-white/90 p-6 sm:p-7 flex flex-col justify-between h-full hover:bg-white transition-all border-pink-100 shadow-cartoon relative overflow-hidden"
           >
-            <div className="space-y-6">
-              <div className="icon-3d h-14 w-14 rounded-3xl border border-border bg-cartoon-purple/10 flex items-center justify-center text-cartoon-purple group-hover:rotate-6 group-hover:scale-110 transition-all">
-                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
+            <div className="space-y-4">
+              <div className="icon-3d h-13 w-13 rounded-2xl border border-pink-200/80 bg-rose-50 flex items-center justify-center text-primary group-hover:rotate-6 group-hover:scale-105 transition-all shadow-cartoon-sm">
+                <Brush className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-black text-xl sm:text-2xl text-foreground font-nunito tracking-tight">
-                  Dasbor Admin
+                <h3 className="font-bold text-xl sm:text-2xl text-foreground font-jakarta tracking-tight group-hover:text-primary transition-colors">
+                  Studio Padu Padan
                 </h3>
-                <p className="mt-2 text-sm font-bold text-foreground/60 leading-relaxed">
-                  Kelola kategori, tinjau outfit, dan pantau analitik platform.
+                <p className="mt-2 text-sm font-normal text-foreground/70 leading-relaxed">
+                  Eksplorasi kombinasi atasan, bawahan, dress, dan aksesori dengan visualisasi warna di ruang 3D interaktif.
                 </p>
               </div>
             </div>
-            <span className="text-sm font-black text-cartoon-purple mt-8 inline-flex items-center gap-2 group-hover:translate-x-2 transition-transform">
-              Kelola Platform &rarr;
+            <span className="text-sm font-bold text-primary mt-6 inline-flex items-center gap-2 group-hover:translate-x-1.5 transition-transform">
+              Buka Studio Kreasi &rarr;
             </span>
-          </Link>
+          </GuestGuardLink>
+        </TiltCard>
+
+        <TiltCard className="reveal stagger-2 h-full">
+          <GuestGuardLink
+            href="/creator#advisor"
+            isLoggedIn={isLoggedIn}
+            className="group cartoon-card bg-white/90 p-6 sm:p-7 flex flex-col justify-between h-full hover:bg-white transition-all border-pink-100 shadow-cartoon relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
+            <div className="space-y-4">
+              <div className="icon-3d h-13 w-13 rounded-2xl border border-pink-200/80 bg-rose-50 flex items-center justify-center text-primary group-hover:-rotate-6 group-hover:scale-105 transition-all shadow-cartoon-sm">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl sm:text-2xl text-foreground font-jakarta tracking-tight group-hover:text-primary transition-colors">
+                  Panduan Warna Kulit
+                </h3>
+                <p className="mt-2 text-sm font-normal text-foreground/70 leading-relaxed">
+                  Temukan palet warna pakaian yang paling serasi dan memancarkan pesona alami dari tone kulitmu.
+                </p>
+              </div>
+            </div>
+            <span className="text-sm font-bold text-primary mt-6 inline-flex items-center gap-2 group-hover:translate-x-1.5 transition-transform">
+              Lihat Rekomendasi Warna &rarr;
+            </span>
+          </GuestGuardLink>
+        </TiltCard>
+
+        {isAdmin && (
+          <TiltCard className="reveal stagger-3 h-full">
+            <Link
+              href="/admin/categories"
+              className="group cartoon-card bg-white/90 p-6 sm:p-7 flex flex-col justify-between h-full hover:bg-white transition-all border-pink-100 shadow-cartoon relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
+              <div className="space-y-4">
+                <div className="icon-3d h-13 w-13 rounded-2xl border border-border bg-purple-50 flex items-center justify-center text-purple-700 group-hover:rotate-6 group-hover:scale-105 transition-all shadow-cartoon-sm">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-xl sm:text-2xl text-foreground font-jakarta tracking-tight group-hover:text-purple-700 transition-colors">
+                    Dasbor Kurator
+                  </h3>
+                  <p className="mt-2 text-sm font-normal text-foreground/70 leading-relaxed">
+                    Kelola kategori busana, kurasi koleksi outfit, moderasi ulasan, dan pantau statistik platform.
+                  </p>
+                </div>
+              </div>
+              <span className="text-sm font-bold text-purple-700 mt-6 inline-flex items-center gap-2 group-hover:translate-x-1.5 transition-transform">
+                Kelola Platform &rarr;
+              </span>
+            </Link>
+          </TiltCard>
         )}
-      </div>
+      </ScrollReveal>
 
       {/* ====  Outfit Grid Feed with Category Filter  ==== */}
       <HomeClient outfits={displayOutfits} isLoggedIn={isLoggedIn} />

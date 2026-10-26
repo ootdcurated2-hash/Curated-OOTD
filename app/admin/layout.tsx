@@ -19,6 +19,8 @@ import AdminNotificationBell from "@/components/AdminNotificationBell";
 import { getAdminProfile } from "@/lib/adminServer";
 
 
+import AdminNav from "@/components/AdminNav";
+
 export default async function AdminLayout({
   children,
 }: {
@@ -82,16 +84,16 @@ export default async function AdminLayout({
     if (profileRow?.avatar_url) adminAvatar = profileRow.avatar_url;
   }
 
-  const navLinkClass =
-    "inline-flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-black bg-white/80 backdrop-blur-md border border-border hover:bg-secondary text-foreground shadow-cartoon-sm hover:-translate-y-0.5 transition-all whitespace-nowrap";
-
   return (
     <div className="min-h-screen bg-background">
       {/* Client-side fallback auth guard */}
       <AdminAuthGuard />
 
       {/* Admin bar — fixed (navbar utama disembunyikan di /admin) */}
-      <header className="panel-3d fixed top-0 left-0 right-0 z-50 border-b border-border bg-white/85 backdrop-blur-xl shadow-cartoon-sm pt-[env(safe-area-inset-top,0px)]">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/80 bg-white/95 backdrop-blur-xl shadow-cartoon-sm pt-[env(safe-area-inset-top,0px)]">
+        {/* Delicate warm rose accent line */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
         <div className="container max-w-7xl px-3 sm:px-6 py-2.5 space-y-2.5">
           <div className="flex items-center justify-between gap-3 min-w-0">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -125,38 +127,7 @@ export default async function AdminLayout({
             </div>
           </div>
 
-          <nav
-            className="-mx-3 px-3 sm:mx-0 sm:px-0 overflow-x-auto overscroll-x-contain [scrollbar-width:thin]"
-            aria-label="Navigasi panel admin"
-          >
-            <div className="flex flex-nowrap items-center gap-1.5 sm:gap-2 pb-0.5 w-max sm:w-full sm:flex-wrap">
-              <Link href="/admin" className={navLinkClass}>
-                <LayoutGrid className="h-3.5 w-3.5 text-primary/70" />
-                Kelola Outfit
-              </Link>
-              <Link href="/admin/analytics" className={navLinkClass}>
-                <BarChart3 className="h-3.5 w-3.5 text-cartoon-purple" />
-                Statistik
-              </Link>
-              <Link href="/admin/categories" className={navLinkClass}>
-                Kategori
-              </Link>
-              <Link href="/admin/reviews" className={navLinkClass}>
-                <Star className="h-3.5 w-3.5 text-primary" />
-                Ulasan
-              </Link>
-              <Link href="/admin/settings" className={navLinkClass}>
-                Pengaturan
-              </Link>
-              <Link
-                href="/admin/outfit/new"
-                className="cartoon-btn inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs font-black bg-primary text-white whitespace-nowrap"
-              >
-                <PlusCircle className="h-3.5 w-3.5" />
-                Tambah Gaya
-              </Link>
-            </div>
-          </nav>
+          <AdminNav />
         </div>
       </header>
 
