@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Sparkles, Trash2, AlertTriangle, Tag } from "lucide-react";
 import HotspotEditor from "@/components/HotspotEditor";
+import ImageUploader from "@/components/ImageUploader";
 import { OutfitItem } from "@/components/OutfitCard";
 import { createClient } from "@/lib/supabase/client";
 import { Category, getStoredCategories, syncCategoriesToLocal } from "@/lib/categories";
@@ -54,7 +55,7 @@ export default function EditOutfitForm({ outfit, outfitItems }: EditOutfitFormPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !imageUrl) {
-      setMessage({ text: "Judul dan URL Foto wajib diisi!", type: "error" });
+      setMessage({ text: "Judul dan Foto Outfit wajib diisi!", type: "error" });
       return;
     }
 
@@ -218,16 +219,12 @@ export default function EditOutfitForm({ outfit, outfitItems }: EditOutfitFormPr
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium mb-1">Image URL</label>
-              <input
-                type="url"
-                required
+              <ImageUploader
                 value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                onChange={setImageUrl}
+                label="Foto Outfit"
               />
             </div>
             <div>
