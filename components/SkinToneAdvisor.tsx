@@ -9,7 +9,20 @@ interface SkinToneAdvisorProps {
   onApplyPalette?: (paletteColors: string[]) => void;
 }
 
-type SourceType = "grok_ai" | "gemini_ai" | "preset" | "fallback" | "fallback_api_error" | "fallback_empty_response" | "fallback_no_api_response" | "local_curator" | null;
+type SourceType =
+  | "grok_ai"
+  | "gemini_ai"
+  | "nvidia_ai"
+  | "recursive_ai"
+  | "dots_ai"
+  | "preset"
+  | "fallback"
+  | "fallback_api_error"
+  | "fallback_empty_response"
+  | "fallback_no_api_response"
+  | "local_curator"
+  | (string & {})
+  | null;
 
 export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps) {
   const [query, setQuery] = useState("");
@@ -43,16 +56,8 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
         if (json.data.skinToneKey && json.data.skinToneKey !== "custom") {
           setActiveSkinKey(json.data.skinToneKey);
         }
-        if (json.source === "fallback_no_api_response") {
-          setError(
-            json.note ||
-              "AI cloud sementara tidak tersedia. Rekomendasi lokal ditampilkan — coba lagi beberapa menit."
-          );
-        } else if (json.source === "local_curator") {
-          setError(json.note || "Set GEMINI_API_KEY di .env.local lalu restart server dev.");
-        } else {
-          setError(null);
-        }
+        // Jika ada data valid yang didapat, jangan tampilkan banner error merah menakutkan
+        setError(null);
       } else {
         const fallback = getConsultationResponse(textToQuery);
         setResult(fallback);
@@ -81,13 +86,27 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
     }
   };
 
-  const isFromAI = source === "grok_ai" || source === "gemini_ai";
+  const isFromAI = Boolean(
+    source &&
+      (source === "grok_ai" ||
+        source === "gemini_ai" ||
+        source === "nvidia_ai" ||
+        source === "recursive_ai" ||
+        source === "dots_ai" ||
+        source.includes("ai"))
+  );
   const aiBadgeLabel =
     source === "gemini_ai"
       ? "Analisis Gemini AI"
       : source === "grok_ai"
         ? "Analisis Grok AI"
-        : "Kurator Lokal";
+        : source === "nvidia_ai"
+          ? "Analisis NVIDIA Nemotron AI"
+          : isFromAI
+            ? "Analisis Cloud AI"
+            : source === "local_curator" || source === "fallback"
+              ? "Penasihat Gaya Fashion"
+              : "Preset Warna Kulit";
 
   return (
     <div id="advisor" className="cartoon-card bg-white/40 p-6 sm:p-10 space-y-8 backdrop-blur-2xl border-white/40">
@@ -200,11 +219,11 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
         </div>
       )}
 
-      {/* Error banner */}
-      {(error || apiNote) && !loading && (
+      {/* Error banner hanya jika request gagal total tanpa ada hasil */}
+      {error && !result && !loading && (
         <div className="flex items-center gap-3 rounded-[1.5rem] border-2 border-primary/20 bg-primary/5 px-6 py-4 text-sm font-black text-primary">
           <AlertCircle className="h-5 w-5 shrink-0" />
-          <span>{error || apiNote}</span>
+          <span>{error}</span>
         </div>
       )}
 

@@ -12,7 +12,7 @@ import { normalizeOutfitItems } from "@/lib/outfitItems";
 
 import TiltCard from "@/components/TiltCard";
 import ScrollReveal from "@/components/ScrollReveal";
-import { Sparkles, Compass, Wand2 } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -75,26 +75,6 @@ export default async function Home() {
           <p className="animate-hero-entry delay-2 text-sm sm:text-base font-normal text-foreground/70 max-w-xl mx-auto leading-relaxed text-balance">
             Kurasi busana kasual, kantor, hingga hangout untuk wanita. Coba paduan outfit di Studio Kreasi dan temukan warna yang paling pas untukmu.
           </p>
-        </div>
-
-        {/* CTA Buttons — Elegant, warm, tactile */}
-        <div className="animate-hero-entry delay-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto pt-2 max-w-sm sm:max-w-none mx-auto">
-          <GuestGuardLink
-            href="/creator"
-            isLoggedIn={isLoggedIn}
-            className="cartoon-btn touch-target bg-primary hover:bg-primary/95 text-white font-bold px-7 py-3.5 sm:py-3 text-sm text-center shadow-cartoon hover:scale-102 active:scale-98 transition-all min-h-[48px] flex items-center justify-center gap-2 rounded-full"
-          >
-            <Wand2 className="w-4 h-4" />
-            <span>Mulai Padu Padan</span>
-          </GuestGuardLink>
-          <GuestGuardLink
-            href="/creator#advisor"
-            isLoggedIn={isLoggedIn}
-            className="cartoon-btn touch-target bg-white/95 hover:bg-white text-foreground border border-pink-100 font-bold px-7 py-3.5 sm:py-3 text-sm text-center shadow-cartoon-sm hover:scale-102 active:scale-98 transition-all min-h-[48px] flex items-center justify-center gap-2 rounded-full"
-          >
-            <Compass className="w-4 h-4 text-primary" />
-            <span>Cek Warna Kulit</span>
-          </GuestGuardLink>
         </div>
       </section>
 

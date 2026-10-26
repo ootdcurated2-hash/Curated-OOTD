@@ -70,7 +70,7 @@ export default function WishlistPage() {
           </div>
         </div>
       ) : (
-        <OutfitGrid outfits={outfits} />
+        <OutfitGrid outfits={outfits} isLoggedIn={true} />
       )}
     </main>
   );

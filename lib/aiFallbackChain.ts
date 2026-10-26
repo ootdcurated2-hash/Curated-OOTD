@@ -15,47 +15,12 @@ export interface AIResult {
   provider: string;
 }
 
-/** Model gratis di OpenRouter — diurutkan dari yang paling capable */
+/** Model gratis di OpenRouter — diurutkan dari yang paling stabil dan responsif */
 const FREE_OPENROUTER_MODELS = [
   {
-    id: "deepseek/deepseek-chat-v3-0324:free",
-    label: "DeepSeek V3",
-    provider: "deepseek_ai",
-  },
-  {
-    id: "qwen/qwen3-235b-a22b:free",
-    label: "Qwen3 235B",
-    provider: "qwen_ai",
-  },
-  {
-    id: "qwen/qwen3-30b-a3b:free",
-    label: "Qwen3 30B",
-    provider: "qwen_ai",
-  },
-  {
-    id: "openai/gpt-4o-mini:free",
-    label: "GPT-4o Mini",
-    provider: "openai",
-  },
-  {
-    id: "meta-llama/llama-4-maverick:free",
-    label: "Llama 4 Maverick",
-    provider: "meta_llama",
-  },
-  {
-    id: "meta-llama/llama-4-scout:free",
-    label: "Llama 4 Scout",
-    provider: "meta_llama",
-  },
-  {
-    id: "google/gemma-3-27b-it:free",
-    label: "Gemma 3 27B",
-    provider: "google_gemma",
-  },
-  {
-    id: "microsoft/phi-4:free",
-    label: "Microsoft Phi-4",
-    provider: "microsoft_ai",
+    id: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    label: "Nemotron 3 Nano Omni",
+    provider: "nvidia_ai",
   },
 ] as const;
 
@@ -90,7 +55,7 @@ async function tryOpenRouterModel(
         temperature: 0.45,
         max_tokens: 1500,
       }),
-      signal: AbortSignal.timeout(20000),
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) {

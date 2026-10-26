@@ -11,6 +11,7 @@ import {
   toggleWishlistEntry,
   WISHLIST_UPDATED_EVENT,
 } from "@/lib/wishlist";
+import { notifyWishlistToast } from "@/components/WishlistToast";
 
 export interface OutfitItem {
   id: string;
@@ -67,13 +68,23 @@ export default function OutfitCard({ outfit, isLoggedIn: initialIsLoggedIn, onSe
     });
   }, [initialIsLoggedIn]);
 
-  const toggleWishlist = (e: React.MouseEvent) => {
+  const toggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
+    // Pastikan status autentikasi terbaru
+    let authenticated = isAuth;
+    if (authenticated === null) {
+      const supabase = createClient();
+      const { data } = await supabase.auth.getUser();
+      const hasAdmin = typeof document !== "undefined" && document.cookie.includes("admin_session=adminootd_authenticated");
+      authenticated = !!data?.user || hasAdmin;
+      setIsAuth(authenticated);
+    }
+
     // Jika guest (belum login), redirect ke login page
-    if (isAuth === false) {
-      router.push(`/auth/login?next=${encodeURIComponent(`/outfit/${outfit.id}`)}`);
+    if (!authenticated) {
+      router.push(`/auth/login?next=${encodeURIComponent(window.location.pathname || "/")}`);
       return;
     }
 
@@ -85,6 +96,9 @@ export default function OutfitCard({ outfit, isLoggedIn: initialIsLoggedIn, onSe
       tags: outfit.tags,
     });
     setLiked(nowLiked);
+
+    // Tampilkan pop-up notifikasi toast
+    notifyWishlistToast(nowLiked ? "added" : "removed", outfit.title);
   };
 
   // Hitung rentang atau harga item outfit

@@ -143,6 +143,106 @@ export const SKIN_TONE_DATA: Record<string, RecommendationResponse> = {
 export function getConsultationResponse(query: string): RecommendationResponse {
   const normalized = query.toLowerCase();
 
+  // 1. Deteksi pertanyaan Berat Badan / Proporsi Tubuh (misal: "berat badan 67kg", "bb 60", "gemuk", "kurus")
+  const weightMatch = normalized.match(/(\d{2,3})\s*(kg|kilo|kilogram)?/);
+  const isWeightQuery =
+    Boolean(weightMatch) ||
+    normalized.includes("berat badan") ||
+    normalized.includes("berat") ||
+    normalized.includes("bb") ||
+    normalized.includes("gemuk") ||
+    normalized.includes("kurus") ||
+    normalized.includes("berisi") ||
+    normalized.includes("proporsi") ||
+    normalized.includes("perut");
+
+  if (isWeightQuery) {
+    const weightNum = weightMatch ? parseInt(weightMatch[1], 10) : 67;
+    const isMediumToSolid = weightNum >= 60 && weightNum <= 80;
+
+    return {
+      skinToneKey: "custom",
+      skinToneTitle: `Panduan Gaya Proporsi Tubuh (~${weightNum} kg)`,
+      summary: `Untuk postur tubuh sekitar ${weightNum} kg, kunci utamanya adalah memilih siluet pakaian dengan struktur rapi (*clean cut*), potongan regular atau relaxed fit yang tidak terlalu ketat, serta permainan warna monokrom atau kontras vertikal untuk menciptakan siluet tubuh yang proporsional dan percaya diri.`,
+      undertoneAnalysis: `Proporsi tubuh ${weightNum} kg sangat ideal bila didukung ilusi visual garis vertikal (seperti kancing vertikal, celana straight cut, atau jaket/overshirt terbuka) yang memperpanjang postur dan memberi kesan tegap proporsional.`,
+      tips: {
+        title: `Formula Outfit Ideal untuk Berat ~${weightNum} kg`,
+        advice: isMediumToSolid
+          ? "Gunakan atasan potongan Regular atau Relaxed Fit dengan bahan berbobot sedang (seperti Oxford, Heavy Cotton, atau Linen). Padukan dengan celana Straight-leg atau Tapered Pants berpinggang mid-rise agar siluet kaki tampak jenjang."
+          : "Pilih teknik layering (kaos + overshirt/outer) dan potongan celana straight-leg untuk memberi volume yang seimbang pada postur tubuh.",
+        colorPalette: [
+          { name: "Deep Charcoal Black", hex: "#1F2326" },
+          { name: "Navy Blue Solid", hex: "#1C2841" },
+          { name: "Olive Green Earth", hex: "#4A5D4E" },
+          { name: "Broken White", hex: "#F5F2EB" },
+          { name: "Terracotta Muted", hex: "#B85D43" },
+          { name: "Warm Khaki", hex: "#C3B091" },
+        ],
+        avoidColors: [
+          "Garis horizontal lebar yang membuat tubuh terlihat lebih lebar",
+          "Bahan spandex/stretch yang terlalu menempel ketat di badan",
+          "Warna neon mencolok di area yang ingin disamarkan",
+        ],
+        recommendedStyles: [
+          "Smart Casual dengan Overshirt & Straight Chino",
+          "Clean Minimalist Monokrom",
+          "Urban Casual dengan Relaxed Denim",
+          "Layering Ringan (T-shirt + Kemeja Terbuka)",
+        ],
+        examplePieces: [
+          { name: "Kemeja Overshirt Katun", category: "Atasan", reason: "Memberi garis vertikal tegas dan menyamarkan lekuk torso" },
+          { name: "Straight Fit Chino Pant", category: "Bawahan", reason: "Membuat proporsi kaki tampak seimbang dan jenjang" },
+          { name: "Clean Minimalist Sneakers", category: "Alas Kaki", reason: "Menyempurnakan postur dengan gaya bersih elegan" },
+        ],
+      },
+      quickPrompts: [
+        "Outfit kondangan pria sawo matang",
+        "Warna baju yang bikin terlihat langsing",
+        "Kombinasi celana straight cut dan kemeja",
+        "Gaya kasual santai untuk nongkrong",
+      ],
+    };
+  }
+
+  // 2. Deteksi Acara / Event / Formal / Kasual / Kantor / Kuliah
+  if (
+    normalized.includes("kondangan") ||
+    normalized.includes("formal") ||
+    normalized.includes("nikahan") ||
+    normalized.includes("kantor") ||
+    normalized.includes("kerja") ||
+    normalized.includes("interview")
+  ) {
+    return {
+      skinToneKey: "custom",
+      skinToneTitle: "Gaya Formal & Semi-Formal Elegan",
+      summary: "Tampilan rapi dan berkelas dicapai melalui perpaduan kemeja berkerah rapi, celana bahan tailored/ankle pant, serta warna-warna bernada dalam yang memberi kesan profesional dan berkarakter kuat.",
+      undertoneAnalysis: "Warna-warna permata (Navy, Charcoal, Deep Emerald, Wine Red) berpadu sempurna untuk acara formal karena memancarkan aura wibawa tanpa berlebihan.",
+      tips: {
+        title: "Formula Smart Formal & Semi-Formal",
+        advice: "Padukan blazer atau kemeja kancing terstruktur dengan celana bahan slim-straight berpotongan rapi di atas mata kaki. Gunakan sepatu pantofel atau loafers kulit bernuansa netral.",
+        colorPalette: [
+          { name: "Midnight Navy", hex: "#1A2536" },
+          { name: "Charcoal Slate", hex: "#343A40" },
+          { name: "Clean White", hex: "#FFFFFF" },
+          { name: "Deep Maroon", hex: "#5C1D24" },
+          { name: "Caramel Leather", hex: "#8A5A36" },
+        ],
+        avoidColors: ["Warna neon menyala", "Bahan denim belel di acara resmi"],
+        recommendedStyles: ["Smart Casual Tailored", "Semi-Formal Suit", "Modern Minimalist Batik"],
+        examplePieces: [
+          { name: "Blazer Unstructured", category: "Atasan", reason: "Elegan namun tetap nyaman dipakai berjam-jam" },
+          { name: "Trousers Ankle Cut", category: "Bawahan", reason: "Siluet modern yang tidak menumpuk di sepatu" },
+        ],
+      },
+      quickPrompts: [
+        "Warna baju kondangan untuk kulit sawo matang",
+        "Sepatu yang cocok untuk kemeja formal",
+      ],
+    };
+  }
+
+  // 3. Deteksi Warna Kulit
   if (
     normalized.includes("cokelat") ||
     normalized.includes("coklat") ||
@@ -180,6 +280,10 @@ export function getConsultationResponse(query: string): RecommendationResponse {
     return SKIN_TONE_DATA.terang;
   }
 
-  // Default default: sawo matang / cokelat (pertanyaan utama user)
-  return SKIN_TONE_DATA.cokelat;
+  // 4. Default: Rekomendasi pintar umum berbasis pertanyaan user
+  return {
+    ...SKIN_TONE_DATA.cokelat,
+    skinToneTitle: `Rekomendasi Gaya: "${query.trim().slice(0, 45)}"`,
+    summary: `Berdasarkan pertanyaan Anda tentang "${query.trim()}", formula terbaik adalah mengombinasikan warna earth tone hangat yang kontras seimbang dengan siluet potongan busana yang proporsional dan nyaman dipakai sehari-hari.`,
+  };
 }

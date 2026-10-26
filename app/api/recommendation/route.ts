@@ -70,19 +70,18 @@ export async function POST(req: NextRequest) {
     const xaiApiKey = (process.env.XAI_API_KEY || process.env.GROK_API_KEY)?.trim();
     const fullPrompt = `${SYSTEM_PROMPT}\n\nPertanyaan: ${question.trim()}`;
 
-    // ─── 1. Coba Gemini ────────────────────────────────────────────────────────
+    // ─── 1. Coba Gemini (dengan timeout ketat 3.5 detik) ─────────────────────
     if (geminiApiKey) {
       try {
-        const gemini = await generateGeminiText(
+        const geminiPromise = generateGeminiText(
           geminiApiKey,
           fullPrompt,
           process.env.GEMINI_MODEL
         );
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3500));
+        const gemini = await Promise.race([geminiPromise, timeoutPromise]);
 
-        if (gemini?.quotaExhausted) {
-          // Quota / rate-limit habis → langsung lompat ke Grok tanpa tunggu
-          console.warn("[Route] Gemini quota habis → skip ke Grok / OpenRouter");
-        } else if (gemini?.text) {
+        if (gemini?.text) {
           try {
             const parsed = parseRecommendationJson(gemini.text);
             if (isValidRecommendation(parsed)) {
@@ -102,7 +101,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ─── 2. Coba Grok (xAI) ───────────────────────────────────────────────────
+    // ─── 2. Coba Grok (hanya jika key berformat standar xai-) ──────────────────
     if (xaiApiKey && xaiApiKey.startsWith("xai-")) {
       try {
         const grokRes = await fetch("https://api.x.ai/v1/chat/completions", {
@@ -120,13 +119,10 @@ export async function POST(req: NextRequest) {
             temperature: 0.4,
             max_tokens: 1500,
           }),
-          signal: AbortSignal.timeout(12000),
+          signal: AbortSignal.timeout(3000),
         });
 
-        if (grokRes.status === 429) {
-          // Grok quota habis → langsung lompat ke OpenRouter
-          console.warn("[Route] Grok 429 QUOTA HABIS → skip ke OpenRouter");
-        } else if (grokRes.ok) {
+        if (grokRes.ok) {
           const grokData = await grokRes.json();
           const rawContent = grokData.choices?.[0]?.message?.content || "";
           if (rawContent) {
@@ -144,8 +140,6 @@ export async function POST(req: NextRequest) {
               console.error("[Route] Grok JSON parse error:", parseErr);
             }
           }
-        } else {
-          console.warn("[Route] Grok API Error:", grokRes.status);
         }
       } catch (grokErr) {
         console.error("[Route] Grok request failed:", grokErr);

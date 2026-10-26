@@ -131,10 +131,18 @@ export default function ProfileEditor({
         if (!res.ok) throw new Error(data.message || "Gagal memperbarui profil admin");
       } else {
         const supabase = createClient();
-        const updateData: { data: Record<string, string>; password?: string } = {
+        const updateData: {
+          email?: string;
+          data: Record<string, string>;
+          password?: string;
+        } = {
           data: { avatar_url: uploadedAvatarUrl, username: displayName },
         };
         if (newPassword) updateData.password = newPassword;
+        // Hanya kirim field email jika berubah dari email awal
+        const emailChanged = email.trim() !== initialEmail.trim();
+        if (emailChanged && email.trim()) updateData.email = email.trim();
+
         const { error } = await supabase.auth.updateUser(updateData);
         if (error) throw error;
 
@@ -149,6 +157,18 @@ export default function ProfileEditor({
         const syncData = await syncRes.json();
         if (!syncRes.ok || !syncData.success) {
           throw new Error(syncData.message || "Gagal menyimpan foto profil ke database.");
+        }
+
+        if (emailChanged && email.trim()) {
+          setMessage({
+            type: "success",
+            text: `Profil berhasil diperbarui! Email konfirmasi telah dikirim ke ${email.trim()}. Cek inbox Anda untuk mengaktifkan email baru.`,
+          });
+          setNewPassword("");
+          setRepeatPassword("");
+          setTimeout(() => window.location.reload(), 2500);
+          setIsLoading(false);
+          return;
         }
       }
 
@@ -253,19 +273,20 @@ export default function ProfileEditor({
           </div>
           <div className="space-y-1.5">
             <label htmlFor="user-email" className="text-xs font-black text-foreground">
-              Email {!isAdmin && <span className="text-foreground/50 font-bold">(tidak bisa diubah)</span>}
+              Email
+              {!isAdmin && (
+                <span className="ml-1.5 text-[10px] font-bold text-foreground/50">
+                  (konfirmasi akan dikirim ke email baru)
+                </span>
+              )}
             </label>
             <input
               id="user-email"
               type="email"
               value={email}
-              onChange={(e) => isAdmin && setEmail(e.target.value)}
-              readOnly={!isAdmin}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="email@gmail.com"
-              className={cn(
-                "w-full rounded-xl border border-border bg-primary/5 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary",
-                !isAdmin && "opacity-70 cursor-not-allowed"
-              )}
+              className="w-full rounded-xl border border-border bg-primary/5 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         </div>
