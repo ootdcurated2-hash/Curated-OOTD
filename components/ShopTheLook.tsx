@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, ShoppingBag } from "lucide-react";
+import { ExternalLink, ShoppingBag, Plus, Check } from "lucide-react";
 import { OutfitItem } from "./OutfitCard";
+import { addToCart } from "@/lib/cart";
+import { notifyCartToast } from "./CartToast";
 
 interface ShopTheLookProps {
   imageUrl: string;
@@ -214,16 +216,39 @@ export default function ShopTheLook({
                   )}
                 </div>
 
-                <a
-                  href={item.affiliate_url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => handleTrackClick(item)}
-                  className={`inline-flex items-center justify-center gap-1.5 rounded-full px-5 py-2.5 text-xs font-black text-white shadow-cartoon-sm hover:opacity-90 transition-all shrink-0 active:scale-95 ${mp.bg}`}
-                >
-                  Beli di {mp.name}
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
+                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addToCart({
+                        id: item.id,
+                        name: item.name,
+                        brand: item.brand,
+                        price: item.price,
+                        affiliate_url: item.affiliate_url,
+                        outfitId,
+                        outfitImage: imageUrl,
+                      });
+                      notifyCartToast("added", item.name);
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full px-3.5 py-2.5 text-xs font-black text-foreground bg-secondary hover:bg-secondary/80 border border-border shadow-cartoon-sm transition-all active:scale-95"
+                    title="Tambah ke Keranjang"
+                  >
+                    <ShoppingBag className="h-3.5 w-3.5 text-primary" />
+                    <span className="hidden xs:inline">+ Keranjang</span>
+                  </button>
+
+                  <a
+                    href={item.affiliate_url || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => handleTrackClick(item)}
+                    className={`inline-flex items-center justify-center gap-1.5 rounded-full px-4 sm:px-5 py-2.5 text-xs font-black text-white shadow-cartoon-sm hover:opacity-90 transition-all active:scale-95 ${mp.bg}`}
+                  >
+                    Beli di {mp.name}
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
               </div>
             );
           })}

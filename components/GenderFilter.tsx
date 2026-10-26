@@ -179,7 +179,7 @@ export default function GenderFilter({ activeGender, onSelectGender }: GenderFil
                       if (!isKidsActive) onSelectGender("anak-anak");
                       isKidsDropdownOpen ? closeDropdown() : openDropdown();
                     }}
-                    className="px-4 py-2 text-xs font-black tracking-tight"
+                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-black tracking-tight"
                   >
                     {getKidsLabel()}
                   </button>
@@ -190,7 +190,7 @@ export default function GenderFilter({ activeGender, onSelectGender }: GenderFil
                       isKidsDropdownOpen ? closeDropdown() : openDropdown()
                     }
                     aria-label="Pilih sub-gender anak"
-                    className={`pr-3 pl-1 py-2 border-l transition-colors ${
+                    className={`pr-2 sm:pr-3 pl-1 py-1.5 sm:py-2 border-l transition-colors ${
                       isKidsActive
                         ? "border-white/30 text-white"
                         : "border-border text-foreground/60"
@@ -217,7 +217,7 @@ export default function GenderFilter({ activeGender, onSelectGender }: GenderFil
                 onSelectGender(gen.slug);
                 closeDropdown();
               }}
-              className={`pill-3d shrink-0 rounded-full border px-4 py-2 text-xs font-black tracking-tight transition-all ${
+              className={`pill-3d shrink-0 rounded-full border px-2.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-black tracking-tight transition-all ${
                 isActive
                   ? "pill-3d-active border-primary bg-primary text-white"
                   : "border-border bg-white/60 text-foreground backdrop-blur-md hover:bg-secondary"

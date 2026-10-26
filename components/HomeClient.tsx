@@ -14,15 +14,23 @@ interface HomeClientProps {
   isLoggedIn?: boolean;
 }
 
-const ITEMS_PER_PAGE = 5;
-
 export default function HomeClient({ outfits, isLoggedIn = false }: HomeClientProps) {
   const [activeGender, setActiveGender] = useState("all");
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoriesList, setCategoriesList] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
   const collectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const itemsPerPage = isMobile ? 6 : 5;
 
   // Scroll langsung ke koleksi outfit (bukan ke studio kreasi atau paling atas)
   const scrollToCollection = () => {
@@ -143,10 +151,10 @@ export default function HomeClient({ outfits, isLoggedIn = false }: HomeClientPr
   });
 
   // Pagination calculation
-  const totalPages = Math.ceil(filteredOutfits.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredOutfits.length / itemsPerPage);
   const paginatedOutfits = filteredOutfits.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const handlePageChange = (page: number) => {
@@ -205,19 +213,19 @@ export default function HomeClient({ outfits, isLoggedIn = false }: HomeClientPr
   return (
     <div className="space-y-5 sm:space-y-8 min-w-0">
       {/* Search + Gender & Category Controls */}
-      <div className="relative overflow-visible space-y-4 sm:space-y-5 cartoon-card bg-white/40 p-4 sm:p-6 backdrop-blur-2xl border-white/40 shadow-cartoon">
+      <div className="relative overflow-visible space-y-3 sm:space-y-5 cartoon-card bg-white/40 p-3 sm:p-6 backdrop-blur-2xl border-white/40 shadow-cartoon">
         {/* Gender Filter di Atas */}
         <GenderFilter
           activeGender={activeGender}
           onSelectGender={setActiveGender}
         />
 
-        <div className="border-t border-border/40 pt-4" />
+        <div className="border-t border-border/40 pt-2 sm:pt-4" />
 
         {/* Search bar */}
         <div className="relative">
           <svg
-            className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/40 pointer-events-none"
+            className="absolute left-3.5 sm:left-5 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-foreground/40 pointer-events-none"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -234,7 +242,7 @@ export default function HomeClient({ outfits, isLoggedIn = false }: HomeClientPr
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari gaya, tren, atau outfit..."
-            className="input-3d w-full min-w-0 rounded-2xl sm:rounded-[1.5rem] border border-border bg-white/60 pl-12 sm:pl-14 pr-4 sm:pr-6 py-3.5 sm:py-4 text-base sm:text-sm font-black text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-cartoon-sm transition-all backdrop-blur-md"
+            className="input-3d w-full min-w-0 rounded-xl sm:rounded-[1.5rem] border border-border bg-white/60 pl-9 sm:pl-14 pr-3 sm:pr-6 py-2.5 sm:py-4 text-xs sm:text-sm font-bold text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-cartoon-sm transition-all backdrop-blur-md"
           />
         </div>
 

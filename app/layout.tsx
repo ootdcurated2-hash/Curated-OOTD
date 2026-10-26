@@ -54,6 +54,8 @@ const jakarta = Plus_Jakarta_Sans({
 import InstallPwaPrompt from "@/components/InstallPwaPrompt";
 import SplashScreen from "@/components/SplashScreen";
 import WishlistToast from "@/components/WishlistToast";
+import CartToast from "@/components/CartToast";
+import BottomNav from "@/components/BottomNav";
 
 export default function RootLayout({
   children,
@@ -74,8 +76,10 @@ export default function RootLayout({
         >
           {children}
         </LayoutWrapper>
+        <BottomNav />
         <InstallPwaPrompt />
         <WishlistToast />
+        <CartToast />
       </body>
     </html>
   );

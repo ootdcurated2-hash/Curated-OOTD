@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // ── Bersihkan elemen Netlify preview bar ──────────────────────────────
+    // Bersihkan elemen Netlify preview bar jika ada
     function purgeNetlify() {
       const els = document.querySelectorAll(
         'netlify-drawer, #netlify-drawer, iframe[src*="netlify"], [data-netlify-drawer], [data-netlify-deploy-preview]'
@@ -18,24 +19,26 @@ export default function SplashScreen() {
     const observer = new MutationObserver(purgeNetlify);
     observer.observe(document.documentElement, { childList: true, subtree: true });
 
-    // ── Splash Screen — hanya di mode PWA standalone ─────────────────────
+    // Mode standalone (PWA) atau first load di browser
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 
-    if (!isStandalone) return () => observer.disconnect();
-
-    // Cegah splash muncul ulang di sesi yang sama
+    // Tampilkan pada mode standalone atau jika belum pernah ditampilkan pada session
     const shown = sessionStorage.getItem("splash_shown");
-    if (shown) return () => observer.disconnect();
+    
+    // Aktifkan untuk standalone atau kunjungan pertama sesi ini
+    if (!isStandalone && shown) {
+      return () => observer.disconnect();
+    }
 
     sessionStorage.setItem("splash_shown", "1");
     setVisible(true);
 
-    // Mulai fade-out setelah 2.4 detik
-    const fadeTimer = setTimeout(() => setFadeOut(true), 2400);
-    // Benar-benar hapus dari DOM setelah animasi selesai
-    const removeTimer = setTimeout(() => setVisible(false), 3000);
+    // Animasi fade out setelah 2.5 detik
+    const fadeTimer = setTimeout(() => setFadeOut(true), 2500);
+    // Hapus dari DOM setelah 3.1 detik
+    const removeTimer = setTimeout(() => setVisible(false), 3100);
 
     return () => {
       observer.disconnect();
@@ -49,213 +52,257 @@ export default function SplashScreen() {
   return (
     <div
       aria-hidden="true"
+      className="fixed inset-0 z-[999999] flex flex-col items-center justify-center overflow-hidden"
       style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 99999,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(145deg, #fff0f5 0%, #fff6fb 40%, #fce4ec 100%)",
-        transition: "opacity 0.6s ease",
+        background: "radial-gradient(ellipse at 50% 40%, #ffffff 0%, #fff1f6 55%, #ffe5ee 100%)",
+        transition: "opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), transform 0.65s cubic-bezier(0.4, 0, 0.2, 1)",
         opacity: fadeOut ? 0 : 1,
+        transform: fadeOut ? "scale(1.05)" : "scale(1)",
         pointerEvents: fadeOut ? "none" : "auto",
+        perspective: "1200px",
       }}
     >
-      {/* Blob latar dekoratif */}
-      <div style={{
-        position: "absolute",
-        top: "-80px",
-        left: "-80px",
-        width: "320px",
-        height: "320px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,105,155,0.18) 0%, transparent 70%)",
-        animation: "splashPulse 3s ease-in-out infinite",
-      }} />
-      <div style={{
-        position: "absolute",
-        bottom: "-60px",
-        right: "-60px",
-        width: "280px",
-        height: "280px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,160,190,0.15) 0%, transparent 70%)",
-        animation: "splashPulse 3s ease-in-out infinite 1.5s",
-      }} />
-      <div style={{
-        position: "absolute",
-        top: "30%",
-        right: "10%",
-        width: "160px",
-        height: "160px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,182,193,0.12) 0%, transparent 70%)",
-        animation: "splashPulse 4s ease-in-out infinite 0.8s",
-      }} />
+      {/* ── Background Glow & Floating 3D Orbs ── */}
+      <div
+        className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, rgba(255,105,155,0.25) 0%, rgba(255,182,193,0.08) 50%, transparent 70%)",
+          filter: "blur(40px)",
+          animation: "orbFloat 6s ease-in-out infinite alternate",
+        }}
+      />
+      
+      {/* Floating 3D Geometric Ring 1 */}
+      <div
+        className="absolute w-72 h-72 rounded-full border-[1.5px] border-primary/20 pointer-events-none"
+        style={{
+          animation: "rotate3dRing 14s linear infinite",
+          transformStyle: "preserve-3d",
+        }}
+      />
+      {/* Floating 3D Geometric Ring 2 */}
+      <div
+        className="absolute w-96 h-96 rounded-full border border-pink-400/15 pointer-events-none"
+        style={{
+          animation: "rotate3dRingReverse 18s linear infinite",
+          transformStyle: "preserve-3d",
+        }}
+      />
 
-      {/* Kartu logo utama */}
-      <div style={{
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "28px",
-        animation: "splashFadeUp 0.7s cubic-bezier(0.34,1.56,0.64,1) both",
-      }}>
-        {/* Lingkaran glow di belakang logo */}
-        <div style={{
-          position: "absolute",
-          width: "160px",
-          height: "160px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,105,155,0.25) 0%, transparent 70%)",
-          animation: "splashPulse 2.5s ease-in-out infinite",
-          top: "-20px",
-        }} />
-
-        {/* Logo container */}
-        <div style={{
-          position: "relative",
-          width: "110px",
-          height: "110px",
-          borderRadius: "28px",
-          background: "linear-gradient(135deg, #fff 60%, #ffe0ee 100%)",
-          boxShadow: "0 12px 48px rgba(255,80,130,0.22), 0 2px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          animation: "splashBounce 0.9s cubic-bezier(0.34,1.56,0.64,1) 0.1s both",
-          border: "1.5px solid rgba(255,105,155,0.15)",
-        }}>
-          {/* Ring animasi di sekitar logo */}
-          <div style={{
-            position: "absolute",
-            inset: "-10px",
-            borderRadius: "38px",
-            border: "2px solid rgba(255,105,155,0.2)",
-            animation: "splashRingPop 2.5s ease-in-out infinite",
-          }} />
-          <div style={{
-            position: "absolute",
-            inset: "-20px",
-            borderRadius: "48px",
-            border: "1.5px solid rgba(255,105,155,0.1)",
-            animation: "splashRingPop 2.5s ease-in-out infinite 0.4s",
-          }} />
-
-          <img
-            src="/icon-512-transparent.png"
-            alt="My Curated OOTD"
+      {/* ── Konten Utama dengan Perspektif 3D ── */}
+      <div
+        className="relative z-10 flex flex-col items-center gap-7 px-4"
+        style={{
+          transformStyle: "preserve-3d",
+          animation: "splashFloatCard 4s ease-in-out infinite",
+        }}
+      >
+        {/* 3D Floating Badge Container */}
+        <div
+          className="relative group"
+          style={{
+            transformStyle: "preserve-3d",
+            animation: "entrance3D 1s cubic-bezier(0.34, 1.56, 0.64, 1) both",
+          }}
+        >
+          {/* Layer Bayangan 3D Bawah */}
+          <div
+            className="absolute -inset-2 rounded-[2.5rem] bg-gradient-to-r from-primary/30 to-pink-500/30 blur-xl opacity-70"
             style={{
-              width: "68px",
-              height: "68px",
-              objectFit: "contain",
-              filter: "drop-shadow(0 4px 12px rgba(255,80,130,0.2))",
+              transform: "translateZ(-40px) translateY(14px) scale(0.9)",
+              animation: "shadowPulse 3s ease-in-out infinite alternate",
             }}
           />
+
+          {/* Kartu 3D Utama */}
+          <div
+            className="relative flex h-28 w-28 sm:h-32 sm:w-32 items-center justify-center rounded-[2.2rem] border-2 border-white/80 bg-gradient-to-br from-white via-pink-50/90 to-pink-100/80 p-5 shadow-[0_20px_50px_rgba(255,107,157,0.35),0_10px_20px_rgba(0,0,0,0.06),inset_0_2px_4px_rgba(255,255,255,0.9)] backdrop-blur-xl"
+            style={{
+              transformStyle: "preserve-3d",
+              transform: "translateZ(30px)",
+            }}
+          >
+            {/* Inner Glare Effect */}
+            <div className="absolute inset-0 rounded-[2.1rem] bg-gradient-to-tr from-white/40 via-transparent to-transparent pointer-events-none" />
+
+            {/* Logo Image dengan Efek Pop-out 3D */}
+            <div
+              className="relative w-full h-full flex items-center justify-center"
+              style={{
+                transform: "translateZ(45px)",
+                filter: "drop-shadow(0 12px 24px rgba(255,80,130,0.3))",
+              }}
+            >
+              <img
+                src="/icon-512-transparent.png"
+                alt="My Curated OOTD Logo"
+                className="w-full h-full object-contain select-none"
+                style={{
+                  animation: "logoPop 3s ease-in-out infinite alternate",
+                }}
+              />
+            </div>
+
+            {/* Badge Aksen Sparkle Pojok */}
+            <div
+              className="absolute -top-2.5 -right-2.5 flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-pink-600 text-white shadow-cartoon-sm border-2 border-white"
+              style={{
+                transform: "translateZ(60px)",
+                animation: "sparkleBob 2.5s ease-in-out infinite alternate",
+              }}
+            >
+              <Sparkles className="h-4 w-4" />
+            </div>
+          </div>
         </div>
 
-        {/* Teks nama aplikasi */}
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "8px",
-          animation: "splashFadeUp 0.7s ease 0.3s both",
-        }}>
-          <h1 style={{
-            margin: 0,
-            fontFamily: "var(--font-nunito), Nunito, sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(22px, 5vw, 28px)",
-            letterSpacing: "-0.5px",
-            color: "#1a1a2e",
-            lineHeight: 1.1,
-            textAlign: "center",
-          }}>
+        {/* Teks Judul & Subtitle */}
+        <div
+          className="flex flex-col items-center text-center space-y-2"
+          style={{
+            transformStyle: "preserve-3d",
+            transform: "translateZ(25px)",
+            animation: "textSlideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both",
+          }}
+        >
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-[11px] font-black text-primary uppercase tracking-widest backdrop-blur-md">
+            Fashion Daily Curation
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl font-black font-nunito tracking-tight text-foreground leading-none">
             My{" "}
-            <span style={{
-              background: "linear-gradient(135deg, #ff6b9d, #ff4d8d, #e91e8c)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>Curated</span>
-            {" "}OOTD
+            <span className="bg-gradient-to-r from-primary via-pink-500 to-rose-500 bg-clip-text text-transparent">
+              Curated
+            </span>{" "}
+            OOTD
           </h1>
-          <p style={{
-            margin: 0,
-            fontFamily: "var(--font-nunito), Nunito, sans-serif",
-            fontWeight: 700,
-            fontSize: "12px",
-            color: "#888",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            textAlign: "center",
-          }}>
-            Outfit of the Day ✨
+
+          <p className="text-xs sm:text-sm font-bold text-foreground/50 tracking-wide">
+            Inspirasi Gaya & Belanja Marketplace Pilihan
           </p>
         </div>
 
-        {/* Loading dots */}
-        <div style={{
-          display: "flex",
-          gap: "8px",
-          marginTop: "4px",
-          animation: "splashFadeUp 0.7s ease 0.5s both",
-        }}>
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, #ff6b9d, #e91e8c)",
-                animation: `splashDot 1.2s ease-in-out infinite ${i * 0.2}s`,
-              }}
-            />
-          ))}
+        {/* 3D Progress Bar / Indicator */}
+        <div
+          className="w-48 sm:w-56 h-2 rounded-full bg-pink-200/60 p-0.5 overflow-hidden shadow-inner backdrop-blur-md"
+          style={{
+            transform: "translateZ(15px)",
+            animation: "textSlideUp 0.8s ease 0.4s both",
+          }}
+        >
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-primary via-pink-500 to-rose-400 shadow-[0_0_12px_rgba(255,107,157,0.8)]"
+            style={{
+              animation: "splashLoadProgress 2.2s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+            }}
+          />
         </div>
       </div>
 
-      {/* Tagline bawah */}
-      <p style={{
-        position: "absolute",
-        bottom: "40px",
-        margin: 0,
-        fontFamily: "var(--font-nunito), Nunito, sans-serif",
-        fontWeight: 600,
-        fontSize: "11px",
-        color: "rgba(0,0,0,0.3)",
-        letterSpacing: "0.06em",
-        animation: "splashFadeUp 0.7s ease 0.7s both",
-        textAlign: "center",
-      }}>
-        Temukan Inspirasi Outfit Terbaikmu
-      </p>
+      {/* Footer Branding Kecil */}
+      <div
+        className="absolute bottom-6 flex items-center gap-2 text-center text-[11px] font-bold text-foreground/40 tracking-wider uppercase"
+        style={{
+          animation: "textSlideUp 0.8s ease 0.5s both",
+        }}
+      >
+        <span>Outfit of the Day</span>
+        <span className="text-primary">•</span>
+        <span>Curated for You</span>
+      </div>
 
       <style>{`
-        @keyframes splashFadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
+        @keyframes entrance3D {
+          0% {
+            opacity: 0;
+            transform: perspective(1000px) rotateX(30deg) translateY(40px) scale(0.7);
+          }
+          100% {
+            opacity: 1;
+            transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+          }
         }
-        @keyframes splashBounce {
-          from { opacity: 0; transform: scale(0.5); }
-          to   { opacity: 1; transform: scale(1); }
+        @keyframes splashFloatCard {
+          0%, 100% {
+            transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+          }
+          50% {
+            transform: translateY(-8px) rotateX(4deg) rotateY(-4deg);
+          }
         }
-        @keyframes splashPulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50%       { transform: scale(1.15); opacity: 0.7; }
+        @keyframes logoPop {
+          0% {
+            transform: translateZ(45px) scale(1);
+          }
+          100% {
+            transform: translateZ(55px) scale(1.06);
+          }
         }
-        @keyframes splashRingPop {
-          0%, 100% { transform: scale(1); opacity: 0.6; }
-          50%       { transform: scale(1.08); opacity: 0.2; }
+        @keyframes shadowPulse {
+          0% {
+            opacity: 0.5;
+            transform: translateZ(-40px) translateY(14px) scale(0.85);
+          }
+          100% {
+            opacity: 0.85;
+            transform: translateZ(-40px) translateY(22px) scale(1.02);
+          }
         }
-        @keyframes splashDot {
-          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-          40%            { transform: scale(1.2); opacity: 1; }
+        @keyframes rotate3dRing {
+          0% {
+            transform: rotateX(65deg) rotateY(25deg) rotateZ(0deg);
+          }
+          100% {
+            transform: rotateX(65deg) rotateY(25deg) rotateZ(360deg);
+          }
+        }
+        @keyframes rotate3dRingReverse {
+          0% {
+            transform: rotateX(60deg) rotateY(-30deg) rotateZ(360deg);
+          }
+          100% {
+            transform: rotateX(60deg) rotateY(-30deg) rotateZ(0deg);
+          }
+        }
+        @keyframes orbFloat {
+          0% {
+            transform: translate(-10%, -10%) scale(1);
+          }
+          100% {
+            transform: translate(10%, 10%) scale(1.2);
+          }
+        }
+        @keyframes textSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(18px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes sparkleBob {
+          0% {
+            transform: translateZ(60px) rotate(0deg) scale(1);
+          }
+          100% {
+            transform: translateZ(65px) rotate(15deg) scale(1.15);
+          }
+        }
+        @keyframes splashLoadProgress {
+          0% {
+            width: 0%;
+          }
+          40% {
+            width: 65%;
+          }
+          85% {
+            width: 90%;
+          }
+          100% {
+            width: 100%;
+          }
         }
       `}</style>
     </div>

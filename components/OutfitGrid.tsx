@@ -16,7 +16,7 @@ export default function OutfitGrid({ outfits = [], isLoggedIn = false, onSelectT
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {outfits.map((outfit) => (
         <OutfitCard
           key={outfit.id}

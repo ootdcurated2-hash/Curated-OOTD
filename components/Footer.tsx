@@ -144,11 +144,11 @@ export default function Footer() {
       <footer className="w-full border-t border-border/80 bg-white/80 backdrop-blur-xl relative">
         {/* Delicate warm rose accent line */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        <div className="container max-w-7xl py-10 sm:py-16 px-4 sm:px-8">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-12 pb-8 sm:pb-12 border-b border-border">
-            {/* Logo & Deskripsi */}
-            <div className="text-center lg:text-left space-y-4 max-w-md">
-              <Link href="/" className="inline-flex items-center gap-3 group">
+        <div className="container max-w-7xl pt-10 sm:pt-16 pb-28 sm:pb-16 px-4 sm:px-8">
+          <div className="flex flex-col items-center justify-center gap-8 sm:gap-12 pb-8 sm:pb-12 border-b border-border">
+            {/* Logo & Deskripsi + Social Icons */}
+            <div className="text-center space-y-4 max-w-xl w-full">
+              <Link href="/" className="inline-flex items-center justify-center gap-3 group">
                 <div className="icon-3d h-14 w-14 rounded-2xl border border-border bg-white p-2 shadow-cartoon-sm transition-all duration-300 group-hover:rotate-6 group-hover:scale-110">
                   <img
                     src="/logo-icon.png"
@@ -169,61 +169,125 @@ export default function Footer() {
               <p className="text-sm font-bold text-foreground/60 leading-relaxed">
                 Inspirasi koleksi outfit kurasi harian dengan hotspot interaktif untuk belanja langsung dari marketplace pilihan.
               </p>
+              {/* Social Icon Circles */}
+              <div className="flex items-center justify-center gap-3 pt-1">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
+                    title={social.label}
+                    className={`flex items-center justify-center h-10 w-10 rounded-full border border-border bg-white shadow-cartoon-sm text-foreground/60 transition-all duration-200 hover:scale-110 hover:shadow-cartoon ${social.color}`}
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Section Menu Footer: Tentang Kami, Informasi, Kontak */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 sm:py-12 border-b border-border/80">
+            {/* Kolom 1: Tentang Kami */}
+            <div className="space-y-3">
+              <h4 className="text-sm sm:text-base font-black font-nunito text-foreground tracking-tight">
+                Tentang Kami
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm font-semibold text-foreground/70">
+                <li>
+                  <Link href="/about" className="hover:text-primary transition-colors">
+                    Tentang
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="hover:text-primary transition-colors">
+                    FAQ
+                  </Link>
+                </li>
+              </ul>
             </div>
 
-            {/* Social Links Cards & Tombol Dukung */}
-            <div className="flex flex-wrap justify-center lg:justify-end items-center gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.name}
-                  className="flex items-center gap-3 rounded-2xl border border-border bg-white/80 px-5 py-3 text-xs font-black text-foreground shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all backdrop-blur-md"
-                >
-                  <div className="text-primary">{social.icon}</div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-[9px] uppercase font-black tracking-widest opacity-60">
-                      {social.name}
-                    </span>
-                    <span className="font-black text-foreground">{social.label}</span>
-                  </div>
-                </a>
-              ))}
+            {/* Kolom 2: Informasi */}
+            <div className="space-y-3">
+              <h4 className="text-sm sm:text-base font-black font-nunito text-foreground tracking-tight">
+                Informasi
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm font-semibold text-foreground/70">
+                <li>
+                  <Link href="/help" className="hover:text-primary transition-colors">
+                    Pusat Bantuan
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-primary transition-colors">
+                    Syarat & Ketentuan
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="hover:text-primary transition-colors">
+                    Privasi
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
+            {/* Kolom 3: Kontak Langsung */}
+            <div className="space-y-3">
+              <h4 className="text-sm sm:text-base font-black font-nunito text-foreground tracking-tight">
+                Hubungi Kami
+              </h4>
+              <ul className="space-y-2.5 text-xs sm:text-sm font-semibold text-foreground/70">
+                <li>
+                  <a
+                    href="mailto:ootdcurated@gmail.com"
+                    className="inline-flex items-center gap-2 hover:text-primary transition-colors"
+                  >
+                    <svg className="h-4 w-4 text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="20" height="16" x="2" y="4" rx="2" />
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                    </svg>
+                    <span>ootdcurated@gmail.com</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://wa.me/62895326595608"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 hover:text-emerald-600 transition-colors"
+                  >
+                    <svg className="h-4 w-4 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.13 7.39C8.94 7.39 8.63 7.46 8.37 7.74C8.11 8.03 7.37 8.72 7.37 10.13C7.37 11.54 8.4 12.9 8.54 13.1C8.68 13.29 10.53 16.15 13.43 17.4C14.12 17.7 14.66 17.88 15.08 18.01C15.78 18.24 16.42 18.21 16.92 18.13C17.48 18.05 18.64 17.43 18.88 16.74C19.12 16.06 19.12 15.47 19.05 15.35C18.98 15.23 18.79 15.16 18.51 15.03C18.23 14.89 16.86 14.21 16.6 14.12C16.35 14.03 16.16 13.98 15.98 14.26C15.79 14.54 15.26 15.16 15.1 15.35C14.94 15.54 14.78 15.56 14.5 15.42C14.22 15.28 13.33 14.99 12.27 14.05C11.45 13.31 10.89 12.41 10.73 12.13C10.57 11.85 10.71 11.7 10.85 11.56C10.98 11.43 11.14 11.22 11.28 11.06C11.42 10.9 11.47 10.78 11.56 10.6C11.65 10.41 11.61 10.25 11.54 10.11C11.47 9.97 10.91 8.6 10.68 8.04C10.45 7.5 10.22 7.58 10.05 7.57C9.9 7.57 9.71 7.57 9.53 7.57C9.34 7.57 9.13 7.39 9.13 7.39Z" />
+                    </svg>
+                    <span>0895326595608</span>
+                  </a>
+                </li>
+              </ul>
               {/* Tombol Dukung Kami */}
               <button
                 type="button"
                 onClick={() => setShowDonateModal(true)}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-primary px-5 py-3 text-xs font-black text-white shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all"
+                className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-primary px-4 py-2 text-xs font-black text-white shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all"
               >
-                <Coffee className="h-6 w-6" />
-                <div className="flex flex-col text-left">
-                  <span className="text-[9px] uppercase font-black tracking-widest opacity-90">
-                    Donasi / Sawer
-                  </span>
-                  <span className="font-black">Dukung Kami</span>
-                </div>
+                <Coffee className="h-4 w-4" />
+                <span>Dukung / Sawer Kami</span>
               </button>
             </div>
           </div>
 
           {/* Copyright & Info Pembuat */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-12 text-sm font-bold text-foreground/50">
-            <p>© <span suppressHydrationWarning>{currentYear || ""}</span> My Curated OOTD. Hak Cipta Dilindungi.</p>
-            <div className="flex items-center gap-2">
-              <span>Dibuat dengan</span>
-              <Heart className="h-4 w-4 text-primary animate-pulse" />
-              <span>oleh</span>
-              <a
-                href="https://www.instagram.com/mycuratedootd?xtok=MW9zcWNpbnl3eDIxdQ=="
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-black text-foreground hover:text-primary transition-colors underline decoration-primary decoration-2 underline-offset-4"
-              >
-                Tim My Curated OOTD
-              </a>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-xs sm:text-sm font-semibold text-foreground/70 text-center sm:text-left pb-4 sm:pb-0">
+            <p>© <span suppressHydrationWarning>{currentYear || "2026"}</span> My Curated OOTD. All Rights Reserved.</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-foreground/70">
+              <Link href="/privacy" className="hover:text-primary transition-colors">
+                Privasi
+              </Link>
+              <span>•</span>
+              <Link href="/terms" className="hover:text-primary transition-colors">
+                Syarat & Ketentuan
+              </Link>
             </div>
           </div>
         </div>

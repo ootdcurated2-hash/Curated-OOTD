@@ -33,7 +33,7 @@ export default function LayoutWrapper({
     <div className="relative flex-1 flex flex-col w-full depth-root">
       <Scene3DDecor />
       {navbar}
-      <div className="relative z-[1] flex-1 w-full">{children}</div>
+      <div className="relative z-[1] flex-1 w-full pb-20 md:pb-0">{children}</div>
       {footer}
     </div>
   );

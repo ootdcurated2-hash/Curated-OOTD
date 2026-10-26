@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { Heart, PlusCircle, Bot } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { AuthButton } from "./auth-button";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isUserAdmin } from "@/lib/admin";
-import GuestGuardLink from "./GuestGuardLink";
-
 import NavbarClientWrapper from "./NavbarClientWrapper";
+import NavbarNavLinks from "./NavbarNavLinks";
 
 export default async function Navbar() {
   const cookieStore = await cookies();
@@ -37,35 +36,18 @@ export default async function Navbar() {
           </div>
         </Link>
 
-        <nav className="flex shrink-0 items-center gap-1 sm:gap-4">
-          <GuestGuardLink
-            href="/creator"
-            isLoggedIn={isLoggedIn}
-            aria-label="Tanya AI"
-            className="touch-target flex items-center justify-center gap-2 p-2.5 sm:px-4 sm:py-2 rounded-full border border-border bg-white text-xs font-black text-foreground shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all"
-          >
-            <Bot className="h-4 w-4 text-primary shrink-0" />
-            <span className="hidden md:inline">Tanya AI</span>
-          </GuestGuardLink>
+        {/* Desktop Navigation Links */}
+        <NavbarNavLinks isLoggedIn={isLoggedIn} />
 
-          <GuestGuardLink
-            href="/wishlist"
-            isLoggedIn={isLoggedIn}
-            aria-label="Favorit"
-            className="touch-target flex items-center justify-center gap-2 p-2.5 sm:px-4 sm:py-2 rounded-full border border-border bg-white text-xs font-black text-foreground shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all"
-          >
-            <Heart className="h-4 w-4 text-primary shrink-0" />
-            <span className="hidden md:inline">Favorit</span>
-          </GuestGuardLink>
-
+        <nav className="flex shrink-0 items-center gap-1.5 sm:gap-3">
           {isAdmin && (
             <Link
               href="/admin"
               aria-label="Admin"
-              className="touch-target flex items-center justify-center gap-2 p-2.5 sm:px-4 sm:py-2 rounded-full border border-border bg-white text-xs font-black text-foreground shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all"
+              className="touch-target flex items-center justify-center gap-2 p-2 sm:px-3.5 sm:py-1.5 rounded-full border border-border bg-white text-xs font-black text-foreground shadow-cartoon-sm hover:scale-105 hover:shadow-cartoon transition-all"
             >
               <PlusCircle className="h-4 w-4 text-cartoon-purple shrink-0" />
-              <span className="hidden md:inline">Admin</span>
+              <span className="hidden sm:inline">Admin</span>
             </Link>
           )}
 

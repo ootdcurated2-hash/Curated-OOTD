@@ -71,7 +71,7 @@ export default function CategoryFilter({
         {/* Tombol Semua Koleksi */}
         <button
           onClick={() => onSelectCategory("all")}
-          className={`pill-3d shrink-0 rounded-full border px-4 py-2 text-xs font-black tracking-tight transition-all ${
+          className={`pill-3d shrink-0 rounded-full border px-2.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-black tracking-tight transition-all ${
             activeCategory === "all"
               ? "pill-3d-active border-primary bg-primary text-white"
               : "border-border bg-white/60 text-foreground backdrop-blur-md hover:bg-secondary"
@@ -87,7 +87,7 @@ export default function CategoryFilter({
             <button
               key={cat.id}
               onClick={() => onSelectCategory(cat.slug)}
-              className={`pill-3d shrink-0 rounded-full border px-4 py-2 text-xs font-black tracking-tight transition-all ${
+              className={`pill-3d shrink-0 rounded-full border px-2.5 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-black tracking-tight transition-all ${
                 isActive
                   ? "pill-3d-active border-primary bg-primary text-white"
                   : "border-border bg-white/60 text-foreground backdrop-blur-md hover:bg-secondary"
