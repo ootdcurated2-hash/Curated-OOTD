@@ -52,9 +52,9 @@ export async function updateSession(request: NextRequest) {
   const hasAdminSession = request.cookies.get("admin_session")?.value === "adminootd_authenticated";
 
   // Public routes — accessible without login
-  const publicPaths = ["/", "/creator", "/outfit", "/wishlist"];
+  const publicPaths = ["/", "/outfit", "/about", "/faq", "/help", "/privacy", "/terms", "/blog"];
   const isPublicRoute = publicPaths.some(
-    (p) => request.nextUrl.pathname === p || request.nextUrl.pathname.startsWith(p + "/")
+    (p) => request.nextUrl.pathname === p || (p !== "/" && request.nextUrl.pathname.startsWith(p + "/"))
   );
 
   if (
@@ -65,9 +65,10 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/auth") &&
     !request.nextUrl.pathname.startsWith("/api")
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    // no user, redirect the user to the login page with next return parameter
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    url.searchParams.set("next", request.nextUrl.pathname + request.nextUrl.search);
     return NextResponse.redirect(url);
   }
 

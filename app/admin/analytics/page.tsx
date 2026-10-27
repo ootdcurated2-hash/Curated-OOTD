@@ -77,12 +77,14 @@ export default async function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Client component handles all new Date() logic */}
+      {/* Client component handles all new Date() logic & Excel Export */}
       <AnalyticsDashboard
         clicks={safeClicks}
         totalOutfits={outfits?.length ?? 0}
         topOutfits={topOutfits}
         topItems={topItems}
+        outfitsList={(outfits as OutfitRow[]) ?? []}
+        itemsList={(outfitItems as ItemRow[]) ?? []}
       />
     </main>
   );

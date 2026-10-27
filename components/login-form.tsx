@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, RefreshCw, ShieldCheck } from "lucide-react";
 
 function sanitizeNext(next?: string): string {
   if (!next || !next.startsWith("/") || next.startsWith("//")) return "/";
@@ -76,6 +76,34 @@ export function LoginForm({
   const [lockUntil, setLockUntil] = useState<number | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
 
+  // State untuk Captcha Keamanan
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [isRefreshingCaptcha, setIsRefreshingCaptcha] = useState(false);
+
+  // Load captcha saat komponen dimuat
+  const fetchCaptcha = async () => {
+    try {
+      setIsRefreshingCaptcha(true);
+      const res = await fetch("/api/auth/captcha");
+      const data = await res.json();
+      if (data.question && data.token) {
+        setCaptchaQuestion(data.question);
+        setCaptchaToken(data.token);
+        setCaptchaAnswer("");
+      }
+    } catch (e) {
+      console.error("Gagal mengambil captcha:", e);
+    } finally {
+      setIsRefreshingCaptcha(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
   // Inisialisasi status percobaan gagal & lock dari localStorage
   useEffect(() => {
     try {
@@ -135,6 +163,35 @@ export function LoginForm({
       const remSec = s % 60;
       const formatted = m > 0 ? `${m} menit ${remSec} detik` : `${remSec} detik`;
       setError(`Terlalu banyak percobaan gagal (5 kali). Harap tunggu ${formatted} sebelum mencoba lagi.`);
+      return;
+    }
+
+    // Validasi Captcha Keamanan
+    if (!captchaAnswer.trim()) {
+      setError("Silakan isi jawaban verifikasi keamanan.");
+      return;
+    }
+
+    try {
+      const decoded = atob(captchaToken);
+      const [expectedAnswer, timestampStr] = decoded.split(":");
+      const timestamp = parseInt(timestampStr, 10);
+
+      // Kadaluarsa setelah 5 menit
+      if (Date.now() - timestamp > 5 * 60 * 1000) {
+        setError("Verifikasi keamanan sudah kadaluarsa. Silakan klik Ganti Soal.");
+        fetchCaptcha();
+        return;
+      }
+
+      if (captchaAnswer.trim() !== expectedAnswer.trim()) {
+        setError("Jawaban verifikasi keamanan salah. Silakan coba lagi.");
+        fetchCaptcha();
+        return;
+      }
+    } catch {
+      setError("Verifikasi keamanan tidak valid. Silakan klik Ganti Soal.");
+      fetchCaptcha();
       return;
     }
 
@@ -351,6 +408,61 @@ export function LoginForm({
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
+                </div>
+              </div>
+
+              {/* Box Captcha Keamanan — Identik dengan Form Register */}
+              <div className="overflow-hidden rounded-2xl border border-pink-100 bg-gradient-to-br from-pink-50/80 via-white to-rose-50/60 shadow-sm">
+                {/* Header strip */}
+                <div className="flex items-center justify-between border-b border-pink-100/70 bg-white/60 px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/10">
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                    <Label htmlFor="captcha" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">
+                      Verifikasi Keamanan <span className="text-primary">*</span>
+                    </Label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={fetchCaptcha}
+                    disabled={isRefreshingCaptcha}
+                    className="flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-1 text-[10px] font-black text-primary hover:bg-primary/15 transition-colors disabled:opacity-50"
+                    title="Ganti Soal Captcha"
+                  >
+                    <RefreshCw className={cn("h-2.5 w-2.5", isRefreshingCaptcha && "animate-spin")} />
+                    Ganti Soal
+                  </button>
+                </div>
+
+                {/* Captcha Body */}
+                <div className="flex items-center gap-3 px-4 py-3">
+                  {/* Soal */}
+                  <div className="relative flex-shrink-0">
+                    <div className="flex h-12 min-w-[104px] items-center justify-center rounded-xl border-2 border-dashed border-primary/30 bg-white px-4 shadow-inner">
+                      <span className="font-mono text-xl font-black tracking-wider text-primary select-none">
+                        {captchaQuestion || "···"}
+                      </span>
+                    </div>
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[9px] font-black text-white shadow">
+                      ?
+                    </span>
+                  </div>
+
+                  {/* Tanda sama dengan */}
+                  <span className="text-lg font-black text-foreground/30">=</span>
+
+                  {/* Input Jawaban */}
+                  <Input
+                    id="captcha"
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="Jawaban..."
+                    required
+                    value={captchaAnswer}
+                    onChange={(e) => setCaptchaAnswer(e.target.value)}
+                    className="h-12 text-center text-base font-black tracking-widest rounded-xl border-border bg-white shadow-cartoon-sm focus-visible:ring-0 focus:outline-none"
+                  />
                 </div>
               </div>
 

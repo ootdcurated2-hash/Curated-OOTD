@@ -16,13 +16,17 @@
     "@types/nodemailer": "^8.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "docx": "^9.15.0",
+    "exceljs": "^4.4.0",
     "lucide-react": "^0.511.0",
+    "mammoth": "^1.13.0",
     "next": "latest",
     "next-themes": "^0.4.6",
     "nodemailer": "^10.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

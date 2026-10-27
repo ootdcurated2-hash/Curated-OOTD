@@ -35,10 +35,10 @@ export default function SplashScreen() {
     sessionStorage.setItem("splash_shown", "1");
     setVisible(true);
 
-    // Animasi fade out setelah 2.5 detik
-    const fadeTimer = setTimeout(() => setFadeOut(true), 2500);
-    // Hapus dari DOM setelah 3.1 detik
-    const removeTimer = setTimeout(() => setVisible(false), 3100);
+    // Animasi fade out setelah 2.2 detik
+    const fadeTimer = setTimeout(() => setFadeOut(true), 2200);
+    // Hapus dari DOM setelah 2.8 detik
+    const removeTimer = setTimeout(() => setVisible(false), 2800);
 
     return () => {
       observer.disconnect();
@@ -52,29 +52,29 @@ export default function SplashScreen() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 z-[999999] flex flex-col items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-[999999] flex flex-col items-center justify-center overflow-hidden select-none"
       style={{
-        background: "radial-gradient(ellipse at 50% 40%, #ffffff 0%, #fff1f6 55%, #ffe5ee 100%)",
-        transition: "opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), transform 0.65s cubic-bezier(0.4, 0, 0.2, 1)",
+        background: "radial-gradient(ellipse at 50% 38%, #ffffff 0%, #fff4f8 50%, #ffe3ef 100%)",
+        transition: "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
         opacity: fadeOut ? 0 : 1,
-        transform: fadeOut ? "scale(1.05)" : "scale(1)",
+        transform: fadeOut ? "scale(1.04)" : "scale(1)",
         pointerEvents: fadeOut ? "none" : "auto",
         perspective: "1200px",
       }}
     >
-      {/* ── Background Glow & Floating 3D Orbs ── */}
+      {/* ── Background Ambient Glow & Floating 3D Orbs ── */}
       <div
-        className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+        className="absolute w-[520px] h-[520px] rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(circle, rgba(255,105,155,0.25) 0%, rgba(255,182,193,0.08) 50%, transparent 70%)",
-          filter: "blur(40px)",
+          background: "radial-gradient(circle, rgba(255,79,168,0.22) 0%, rgba(255,182,193,0.08) 55%, transparent 75%)",
+          filter: "blur(50px)",
           animation: "orbFloat 6s ease-in-out infinite alternate",
         }}
       />
       
       {/* Floating 3D Geometric Ring 1 */}
       <div
-        className="absolute w-72 h-72 rounded-full border-[1.5px] border-primary/20 pointer-events-none"
+        className="absolute w-80 h-80 rounded-full border-[1.5px] border-primary/20 pointer-events-none"
         style={{
           animation: "rotate3dRing 14s linear infinite",
           transformStyle: "preserve-3d",
@@ -82,7 +82,7 @@ export default function SplashScreen() {
       />
       {/* Floating 3D Geometric Ring 2 */}
       <div
-        className="absolute w-96 h-96 rounded-full border border-pink-400/15 pointer-events-none"
+        className="absolute w-[420px] h-[420px] rounded-full border border-pink-400/15 pointer-events-none"
         style={{
           animation: "rotate3dRingReverse 18s linear infinite",
           transformStyle: "preserve-3d",
@@ -91,7 +91,7 @@ export default function SplashScreen() {
 
       {/* ── Konten Utama dengan Perspektif 3D ── */}
       <div
-        className="relative z-10 flex flex-col items-center gap-7 px-4"
+        className="relative z-10 flex flex-col items-center gap-6 px-6"
         style={{
           transformStyle: "preserve-3d",
           animation: "splashFloatCard 4s ease-in-out infinite",
@@ -102,35 +102,35 @@ export default function SplashScreen() {
           className="relative group"
           style={{
             transformStyle: "preserve-3d",
-            animation: "entrance3D 1s cubic-bezier(0.34, 1.56, 0.64, 1) both",
+            animation: "entrance3D 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both",
           }}
         >
           {/* Layer Bayangan 3D Bawah */}
           <div
-            className="absolute -inset-2 rounded-[2.5rem] bg-gradient-to-r from-primary/30 to-pink-500/30 blur-xl opacity-70"
+            className="absolute -inset-3 rounded-[2.8rem] bg-gradient-to-r from-primary/35 to-rose-400/35 blur-2xl opacity-75"
             style={{
-              transform: "translateZ(-40px) translateY(14px) scale(0.9)",
+              transform: "translateZ(-40px) translateY(16px) scale(0.92)",
               animation: "shadowPulse 3s ease-in-out infinite alternate",
             }}
           />
 
-          {/* Kartu 3D Utama */}
+          {/* Kartu 3D Utama Logo */}
           <div
-            className="relative flex h-28 w-28 sm:h-32 sm:w-32 items-center justify-center rounded-[2.2rem] border-2 border-white/80 bg-gradient-to-br from-white via-pink-50/90 to-pink-100/80 p-5 shadow-[0_20px_50px_rgba(255,107,157,0.35),0_10px_20px_rgba(0,0,0,0.06),inset_0_2px_4px_rgba(255,255,255,0.9)] backdrop-blur-xl"
+            className="relative flex h-32 w-32 sm:h-36 sm:w-36 items-center justify-center rounded-[2.5rem] border border-white/90 bg-gradient-to-b from-white via-pink-50/90 to-rose-50/80 p-5 shadow-[0_24px_60px_rgba(255,79,168,0.28),0_10px_24px_rgba(0,0,0,0.04),inset_0_2px_4px_rgba(255,255,255,0.95)] backdrop-blur-2xl"
             style={{
               transformStyle: "preserve-3d",
               transform: "translateZ(30px)",
             }}
           >
             {/* Inner Glare Effect */}
-            <div className="absolute inset-0 rounded-[2.1rem] bg-gradient-to-tr from-white/40 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 rounded-[2.4rem] bg-gradient-to-tr from-white/60 via-transparent to-transparent pointer-events-none" />
 
             {/* Logo Image dengan Efek Pop-out 3D */}
             <div
               className="relative w-full h-full flex items-center justify-center"
               style={{
                 transform: "translateZ(45px)",
-                filter: "drop-shadow(0 12px 24px rgba(255,80,130,0.3))",
+                filter: "drop-shadow(0 14px 24px rgba(255,79,168,0.25))",
               }}
             >
               <img
@@ -145,7 +145,7 @@ export default function SplashScreen() {
 
             {/* Badge Aksen Sparkle Pojok */}
             <div
-              className="absolute -top-2.5 -right-2.5 flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-pink-600 text-white shadow-cartoon-sm border-2 border-white"
+              className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-rose-500 text-white shadow-cartoon-sm border-2 border-white"
               style={{
                 transform: "translateZ(60px)",
                 animation: "sparkleBob 2.5s ease-in-out infinite alternate",
@@ -158,14 +158,15 @@ export default function SplashScreen() {
 
         {/* Teks Judul & Subtitle */}
         <div
-          className="flex flex-col items-center text-center space-y-2"
+          className="flex flex-col items-center text-center space-y-2.5 pt-2"
           style={{
             transformStyle: "preserve-3d",
             transform: "translateZ(25px)",
-            animation: "textSlideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both",
+            animation: "textSlideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both",
           }}
         >
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-[11px] font-black text-primary uppercase tracking-widest backdrop-blur-md">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-[10px] font-black text-primary uppercase tracking-widest backdrop-blur-md shadow-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             Fashion Daily Curation
           </div>
 
@@ -177,23 +178,23 @@ export default function SplashScreen() {
             OOTD
           </h1>
 
-          <p className="text-xs sm:text-sm font-bold text-foreground/50 tracking-wide">
-            Inspirasi Gaya & Belanja Marketplace Pilihan
+          <p className="text-xs sm:text-sm font-bold text-foreground/60 tracking-wide max-w-xs">
+            Pakaian Pilihan • Gaya Lebih Baik Setiap Hari
           </p>
         </div>
 
         {/* 3D Progress Bar / Indicator */}
         <div
-          className="w-48 sm:w-56 h-2 rounded-full bg-pink-200/60 p-0.5 overflow-hidden shadow-inner backdrop-blur-md"
+          className="w-44 sm:w-52 h-2 rounded-full bg-pink-200/70 p-0.5 overflow-hidden shadow-inner backdrop-blur-md mt-1"
           style={{
             transform: "translateZ(15px)",
-            animation: "textSlideUp 0.8s ease 0.4s both",
+            animation: "textSlideUp 0.8s ease 0.3s both",
           }}
         >
           <div
             className="h-full rounded-full bg-gradient-to-r from-primary via-pink-500 to-rose-400 shadow-[0_0_12px_rgba(255,107,157,0.8)]"
             style={{
-              animation: "splashLoadProgress 2.2s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+              animation: "splashLoadProgress 2s cubic-bezier(0.65, 0, 0.35, 1) forwards",
             }}
           />
         </div>

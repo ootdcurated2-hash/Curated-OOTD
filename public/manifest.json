@@ -4,8 +4,8 @@
   "description": "Temukan Inspirasi Outfit & Belanja Produk Fashion",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#fff7fa",
+  "theme_color": "#ff4fa8",
   "icons": [
     {
       "src": "/icon-192.png",

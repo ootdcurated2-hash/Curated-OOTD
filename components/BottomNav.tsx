@@ -14,6 +14,7 @@ import {
 import { getWishlist, WISHLIST_UPDATED_EVENT } from "@/lib/wishlist";
 import { getCartCount, CART_UPDATED_EVENT } from "@/lib/cart";
 import { createClient } from "@/lib/supabase/client";
+import GuestGuardLink from "@/components/GuestGuardLink";
 
 interface BottomNavProps {
   initialIsLoggedIn?: boolean;
@@ -87,6 +88,7 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
       href: "/",
       icon: Home,
       isActive: isHomeActive,
+      requiresAuth: false,
     },
     {
       id: "tanya-ai",
@@ -94,6 +96,7 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
       href: "/creator",
       icon: Bot,
       isActive: isAIActive,
+      requiresAuth: true,
     },
     {
       id: "keranjang",
@@ -102,6 +105,7 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
       icon: ShoppingBag,
       isActive: isKeranjangActive,
       badge: cartCount > 0 ? (cartCount > 99 ? "99+" : cartCount) : null,
+      requiresAuth: true,
     },
     {
       id: "favorit",
@@ -110,6 +114,7 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
       icon: Heart,
       isActive: isFavoritActive,
       badge: wishlistCount > 0 ? (wishlistCount > 99 ? "99+" : wishlistCount) : null,
+      requiresAuth: true,
     },
     {
       id: "akun",
@@ -117,6 +122,7 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
       href: accountHref,
       icon: User,
       isActive: isAkunActive,
+      requiresAuth: false,
     },
   ];
 
@@ -129,15 +135,12 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = item.isActive;
+          const linkClass = `flex flex-col items-center justify-center py-1 px-1 relative transition-all group ${
+            active ? "text-primary scale-105" : "text-foreground/60 hover:text-foreground"
+          }`;
 
-          return (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={`flex flex-col items-center justify-center py-1 px-1 relative transition-all group ${
-                active ? "text-primary scale-105" : "text-foreground/60 hover:text-foreground"
-              }`}
-            >
+          const innerContent = (
+            <>
               {/* Highlight background pill for active state */}
               <div
                 className={`relative flex items-center justify-center p-1.5 rounded-full transition-all duration-200 ${
@@ -173,6 +176,29 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
               {active && (
                 <span className="w-1 h-1 rounded-full bg-primary mt-1 shadow-sm" />
               )}
+            </>
+          );
+
+          if (item.requiresAuth) {
+            return (
+              <GuestGuardLink
+                key={item.id}
+                href={item.href}
+                isLoggedIn={isLoggedIn}
+                className={linkClass}
+              >
+                {innerContent}
+              </GuestGuardLink>
+            );
+          }
+
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              className={linkClass}
+            >
+              {innerContent}
             </Link>
           );
         })}

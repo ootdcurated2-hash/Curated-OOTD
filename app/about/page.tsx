@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Heart, Sparkles, Users, ShoppingBag, Star, ArrowRight, Shirt, Palette, Code2 } from "lucide-react";
+import { Heart, Sparkles, Users, ShoppingBag, Star, ArrowRight, Shirt, Palette, Code2, BookOpen } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Tentang Kami – My Curated OOTD",
@@ -154,6 +154,31 @@ export default function AboutPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Blog & Inspirasi Section */}
+      <section className="py-14 sm:py-16 px-4 bg-white border-t border-border/60">
+        <div className="container max-w-4xl mx-auto">
+          <div className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/5 via-secondary/40 to-pink-50/60 p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-wider">
+                <BookOpen className="h-3.5 w-3.5" /> Blog & Artikel
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-black font-nunito text-foreground tracking-tight">
+                Baca Inspirasi & Tips Fashion
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold text-foreground/70 max-w-lg leading-relaxed">
+                Temukan panduan gaya, tren OOTD terbaru, dan tips padu padan outfit yang ditulis langsung oleh tim kurator kami.
+              </p>
+            </div>
+            <Link
+              href="/blog"
+              className="shrink-0 inline-flex items-center gap-2 rounded-full bg-primary text-white px-6 py-3 text-xs sm:text-sm font-black shadow-cartoon-sm hover:scale-105 active:scale-95 transition-all"
+            >
+              Kunjungi Blog <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>

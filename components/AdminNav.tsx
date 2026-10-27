@@ -9,6 +9,7 @@ import {
   PlusCircle,
   Settings,
   FolderTree,
+  BookOpen,
 } from "lucide-react";
 
 export default function AdminNav() {
@@ -35,6 +36,11 @@ export default function AdminNav() {
       href: "/admin/reviews",
       label: "Ulasan",
       icon: Star,
+    },
+    {
+      href: "/admin/blog",
+      label: "Blog",
+      icon: BookOpen,
     },
     {
       href: "/admin/settings",
