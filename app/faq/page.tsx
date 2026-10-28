@@ -75,8 +75,8 @@ const faqs = [
         a: "Tanya AI adalah fitur asisten fashion berbasis kecerdasan buatan yang bisa kamu ajak bicara soal gaya, rekomendasi outfit, tips mix & match, dan berbagai pertanyaan seputar fashion.",
       },
       {
-        q: "Apakah Tanya AI gratis?",
-        a: "Tanya AI tersedia untuk pengguna yang sudah login. Akses fitur ini melalui menu Tanya AI di navigasi.",
+        q: "Apakah Tanya AI gratis dan berapa batas bertanya per hari?",
+        a: "Tanya AI dapat digunakan secara gratis oleh pengguna terdaftar dengan batas maksimal 10 kali pertanyaan per hari untuk menjaga kenyamanan dan mencegah spam. Kuota pertanyaan akan otomatis di-reset setiap hari pada pukul 00.00 WIB.",
       },
     ],
   },

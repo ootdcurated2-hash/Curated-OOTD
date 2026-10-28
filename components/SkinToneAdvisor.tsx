@@ -1,9 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RecommendationResponse, SKIN_TONE_DATA, getConsultationResponse } from "@/lib/skinToneAdvisor";
 import Link from "next/link";
-import { Sparkles, Bot, BookOpen, AlertCircle, Loader2 } from "lucide-react";
+import {
+  Sparkles,
+  Bot,
+  BookOpen,
+  AlertCircle,
+  Loader2,
+  Clock,
+  ShieldCheck,
+  Zap,
+  X,
+  Info,
+} from "lucide-react";
+import {
+  AIQuotaStatus,
+  DAILY_LIMIT,
+  getClientQuotaStatus,
+  recordLocalUsage,
+  getTodayDateString,
+} from "@/lib/aiQuota";
+import { createClient } from "@/lib/supabase/client";
+import { isUserAdmin } from "@/lib/admin";
 
 interface SkinToneAdvisorProps {
   onApplyPalette?: (paletteColors: string[]) => void;
@@ -33,22 +53,80 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
   const [error, setError] = useState<string | null>(null);
   const [apiNote, setApiNote] = useState<string | null>(null);
 
+  // Status Kuota Harian (10 pertanyaan / hari untuk role user)
+  const [quota, setQuota] = useState<AIQuotaStatus>({
+    limit: DAILY_LIMIT,
+    used: 0,
+    remaining: DAILY_LIMIT,
+    isAdmin: false,
+    canAsk: true,
+    resetsAt: "",
+    resetDateStr: getTodayDateString(),
+  });
+  const [showQuotaModal, setShowQuotaModal] = useState<boolean>(false);
+  const [quotaNotification, setQuotaNotification] = useState<string | null>(null);
+
+  // Inisialisasi kuota dan verifikasi admin di sisi klien
+  useEffect(() => {
+    async function initQuota() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.auth.getUser();
+        const user = data?.user;
+        const adminCheck = isUserAdmin(user);
+        const currentQuota = getClientQuotaStatus(adminCheck);
+        setQuota(currentQuota);
+      } catch {
+        setQuota(getClientQuotaStatus(false));
+      }
+    }
+    initQuota();
+  }, []);
+
   const handleAsk = async (customText?: string) => {
     const textToQuery = customText !== undefined ? customText : query;
     if (!textToQuery.trim()) return;
 
+    // Cek kuota sebelum mengirim ke backend
+    if (!quota.isAdmin && quota.remaining <= 0) {
+      setShowQuotaModal(true);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setApiNote(null);
+    setQuotaNotification(null);
 
     try {
       const res = await fetch("/api/recommendation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: textToQuery }),
+        body: JSON.stringify({
+          question: textToQuery,
+          clientUsedCount: quota.used,
+        }),
       });
 
       const json = await res.json();
+
+      // Jika kuota habis dari sisi backend (HTTP 429)
+      if (res.status === 429 || json.quotaExceeded) {
+        if (json.quota) {
+          setQuota(json.quota);
+        } else {
+          setQuota((prev) => ({
+            ...prev,
+            used: DAILY_LIMIT,
+            remaining: 0,
+            canAsk: false,
+          }));
+        }
+        setShowQuotaModal(true);
+        setError(json.message || "Batas bertanya AI harian kamu sudah habis.");
+        return;
+      }
+
       if (json.success && json.data) {
         setResult(json.data);
         setSource(json.source || "fallback");
@@ -56,8 +134,37 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
         if (json.data.skinToneKey && json.data.skinToneKey !== "custom") {
           setActiveSkinKey(json.data.skinToneKey);
         }
-        // Jika ada data valid yang didapat, jangan tampilkan banner error merah menakutkan
         setError(null);
+
+        // Update kuota harian setelah berhasil bertanya
+        if (!quota.isAdmin) {
+          const updatedUsage = recordLocalUsage(1);
+          const newUsed = updatedUsage.count;
+          const newRemaining = Math.max(0, DAILY_LIMIT - newUsed);
+          const updatedQuota: AIQuotaStatus = {
+            ...quota,
+            used: newUsed,
+            remaining: newRemaining,
+            canAsk: newRemaining > 0,
+          };
+          setQuota(updatedQuota);
+
+          // Tampilkan notifikasi sisa pertanyaan
+          if (newRemaining === 0) {
+            setShowQuotaModal(true);
+            setQuotaNotification(
+              `Ini pertanyaan terakhir kamu untuk hari ini (0/${DAILY_LIMIT} tersisa). Kuota akan di-reset besok pukul 00.00 WIB.`
+            );
+          } else if (newRemaining <= 3) {
+            setQuotaNotification(
+              `Perhatian: Sisa kesempatan bertanya kamu hari ini tersisa ${newRemaining} kali.`
+            );
+          } else {
+            setQuotaNotification(
+              `Pertanyaan berhasil! Sisa kuota bertanya kamu hari ini: ${newRemaining} dari ${DAILY_LIMIT} kali.`
+            );
+          }
+        }
       } else {
         const fallback = getConsultationResponse(textToQuery);
         setResult(fallback);
@@ -109,13 +216,94 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
               : "Preset Warna Kulit";
 
   return (
-    <div id="advisor" className="cartoon-card bg-white/40 p-6 sm:p-10 space-y-8 backdrop-blur-2xl border-white/40">
+    <div id="advisor" className="cartoon-card bg-white/40 p-6 sm:p-10 space-y-8 backdrop-blur-2xl border-white/40 relative">
+      {/* ── Pop-up Modal Saat Batas Kuota Habis ── */}
+      {showQuotaModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+        >
+          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-rose-100 text-center space-y-5">
+            <button
+              onClick={() => setShowQuotaModal(false)}
+              className="absolute top-4 right-4 p-2 text-foreground/40 hover:text-foreground rounded-full hover:bg-muted transition-colors"
+              aria-label="Tutup popup"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-primary">
+              <Clock className="h-8 w-8 animate-pulse" />
+            </div>
+
+            <div className="space-y-2">
+              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-rose-100 text-primary">
+                Batas Harian Tercapai (10/10)
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black font-nunito text-foreground">
+                Batas Tanya AI Hari Ini Habis
+              </h3>
+              <p className="text-xs sm:text-sm text-foreground/70 font-semibold leading-relaxed">
+                Kamu telah mencapai kuota maksimal <strong>10 pertanyaan</strong> untuk hari ini.
+                Untuk menjaga kenyamanan dan mencegah spam, kuota kamu akan otomatis di-reset besok pukul <strong>00.00 WIB</strong>.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border text-left space-y-1.5 text-xs">
+              <div className="flex items-center gap-2 font-black text-foreground">
+                <Info className="h-4 w-4 text-primary shrink-0" />
+                <span>Tips Selama Menunggu Reset:</span>
+              </div>
+              <ul className="list-disc list-inside text-foreground/70 font-medium space-y-1 pl-1 text-[11px]">
+                <li>Gunakan preset panduan warna kulit di bawah (tidak dibatasi kuota).</li>
+                <li>Simpan inspirasi OOTD dari galeri utama ke favorit.</li>
+                <li>Buat padu padan busana di studio Creator OOTD.</li>
+              </ul>
+            </div>
+
+            <button
+              onClick={() => setShowQuotaModal(false)}
+              className="cartoon-btn w-full bg-primary text-white py-3.5 text-sm font-black shadow-cartoon-sm"
+            >
+              Mengerti, Terima Kasih!
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-border pb-8">
         <div className="space-y-2 max-w-xl">
-          <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-accent/10 text-accent px-4 py-1 rounded-full border border-accent/20 shadow-sm">
-            <Sparkles className="h-3.5 w-3.5" /> Penasihat Fashion AI
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-accent/10 text-accent px-4 py-1 rounded-full border border-accent/20 shadow-sm">
+              <Sparkles className="h-3.5 w-3.5" /> Penasihat Fashion AI
+            </span>
+
+            {/* Badge Indikator Sisa Kuota */}
+            {quota.isAdmin ? (
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full shadow-xs">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Admin: Akses Kuota Unlimited
+              </span>
+            ) : (
+              <button
+                onClick={() => {
+                  if (quota.remaining <= 0) setShowQuotaModal(true);
+                }}
+                className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border shadow-xs transition-transform active:scale-95 ${
+                  quota.remaining <= 2
+                    ? "bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100"
+                    : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15"
+                }`}
+                title="Batas bertanya: 10 kali/hari. Reset setiap hari pukul 00.00 WIB."
+              >
+                <Zap className="h-3 w-3 fill-current" />
+                Sisa Kuota Hari Ini: {quota.remaining}/{DAILY_LIMIT}
+              </button>
+            )}
+          </div>
+
           <h2 className="text-2xl sm:text-4xl font-black font-nunito tracking-tighter text-foreground">
             {result && source !== "preset" ? "Laporan Gaya AI" : "Panduan Warna Kulit & Gaya"}
           </h2>
@@ -147,6 +335,23 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
         </div>
       </div>
 
+      {/* ── Banner Notifikasi Sisa Kuota ── */}
+      {quotaNotification && (
+        <div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl border border-primary/20 bg-primary/5 text-foreground text-xs font-bold animate-in fade-in slide-in-from-top-1">
+          <div className="flex items-center gap-2.5">
+            <Zap className="h-4 w-4 text-primary shrink-0" />
+            <span>{quotaNotification}</span>
+          </div>
+          <button
+            onClick={() => setQuotaNotification(null)}
+            className="p-1 text-foreground/40 hover:text-foreground rounded-lg"
+            aria-label="Tutup notifikasi"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Input Bar */}
       <div className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -155,18 +360,28 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !loading && handleAsk()}
-            placeholder="Tanya apa saja... (mis: warna terbaik untuk pesta pantai musim panas)"
-            className="w-full sm:flex-1 rounded-[1.5rem] border border-border bg-white/60 px-6 py-4 text-sm font-bold text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-cartoon-sm transition-all"
+            placeholder={
+              !quota.isAdmin && quota.remaining <= 0
+                ? "Batas harian habis (10/10). Reset besok pukul 00.00 WIB."
+                : `Tanya apa saja... (Sisa kuota: ${quota.isAdmin ? 'Unlimited' : `${quota.remaining}/${DAILY_LIMIT}`})`
+            }
+            disabled={!quota.isAdmin && quota.remaining <= 0}
+            className="w-full sm:flex-1 rounded-[1.5rem] border border-border bg-white/60 px-6 py-4 text-sm font-bold text-foreground placeholder:text-foreground/30 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-cartoon-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           />
           <button
             onClick={() => handleAsk()}
-            disabled={loading}
+            disabled={loading || (!quota.isAdmin && quota.remaining <= 0)}
             className="cartoon-btn w-full sm:w-auto shrink-0 bg-primary text-white px-8 py-4 text-sm font-black disabled:opacity-50 flex items-center gap-2 sm:min-w-[160px] justify-center"
           >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Menganalisis...
+              </>
+            ) : !quota.isAdmin && quota.remaining <= 0 ? (
+              <>
+                <Clock className="h-4 w-4" />
+                Batas Habis (10/10)
               </>
             ) : (
               <>

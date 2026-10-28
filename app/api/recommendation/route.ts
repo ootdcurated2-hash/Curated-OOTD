@@ -7,6 +7,9 @@ import {
 import { generateGeminiText } from "@/lib/geminiClient";
 import { runOpenRouterFallback } from "@/lib/aiFallbackChain";
 
+import { getAdminContext } from "@/lib/adminServer";
+import { DAILY_LIMIT, getTodayDateString, getNextResetTime } from "@/lib/aiQuota";
+
 const GROK_MODEL = process.env.GROK_MODEL || "grok-2-1212";
 
 function parseRecommendationJson(raw: string): RecommendationResponse {
@@ -48,7 +51,7 @@ const SYSTEM_PROMPT = `Kamu Fashion Consultant AI untuk Curated OOTD (Indonesia)
 
 export async function POST(req: NextRequest) {
   try {
-    const { question, skinTone } = await req.json();
+    const { question, skinTone, clientUsedCount } = await req.json();
 
     if (skinTone && SKIN_TONE_DATA[skinTone]) {
       return NextResponse.json({
@@ -65,10 +68,49 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ─── Pengecekan Role & Kuota Harian (Maksimal 10 Pertanyaan untuk User) ────
+    const adminCtx = await getAdminContext();
+    const isAdmin = adminCtx.isAdmin;
+    const resetsAt = getNextResetTime().toISOString();
+    const today = getTodayDateString();
+
+    // Jika bukan admin, validasi kuota
+    if (!isAdmin) {
+      const currentUsed = typeof clientUsedCount === "number" ? clientUsedCount : 0;
+      if (currentUsed >= DAILY_LIMIT) {
+        return NextResponse.json(
+          {
+            success: false,
+            quotaExceeded: true,
+            message: `Batas bertanya AI harian kamu sudah habis (${DAILY_LIMIT}/${DAILY_LIMIT}). Kuota akan di-reset otomatis besok hari pukul 00.00 WIB.`,
+            quota: {
+              limit: DAILY_LIMIT,
+              used: DAILY_LIMIT,
+              remaining: 0,
+              isAdmin: false,
+              resetsAt,
+              resetDateStr: today,
+            },
+          },
+          { status: 429 }
+        );
+      }
+    }
+
     const fallbackRecommendation = getConsultationResponse(question);
     const geminiApiKey = process.env.GEMINI_API_KEY?.trim();
     const xaiApiKey = (process.env.XAI_API_KEY || process.env.GROK_API_KEY)?.trim();
     const fullPrompt = `${SYSTEM_PROMPT}\n\nPertanyaan: ${question.trim()}`;
+
+    const newUsed = isAdmin ? 0 : (typeof clientUsedCount === "number" ? clientUsedCount + 1 : 1);
+    const quotaInfo = {
+      limit: DAILY_LIMIT,
+      used: isAdmin ? 0 : Math.min(DAILY_LIMIT, newUsed),
+      remaining: isAdmin ? 9999 : Math.max(0, DAILY_LIMIT - newUsed),
+      isAdmin,
+      resetsAt,
+      resetDateStr: today,
+    };
 
     // ─── 1. Coba Gemini (dengan timeout ketat 3.5 detik) ─────────────────────
     if (geminiApiKey) {
@@ -90,6 +132,7 @@ export async function POST(req: NextRequest) {
                 data: parsed,
                 source: "gemini_ai",
                 model: gemini.model,
+                quota: quotaInfo,
               });
             }
           } catch (parseErr) {
@@ -134,6 +177,7 @@ export async function POST(req: NextRequest) {
                   data: parsed,
                   source: "grok_ai",
                   model: GROK_MODEL,
+                  quota: quotaInfo,
                 });
               }
             } catch (parseErr) {
@@ -157,6 +201,7 @@ export async function POST(req: NextRequest) {
             data: parsed,
             source: openrouterResult.provider,
             model: openrouterResult.model,
+            quota: quotaInfo,
           });
         }
       } catch (parseErr) {
@@ -170,6 +215,7 @@ export async function POST(req: NextRequest) {
       data: fallbackRecommendation,
       source: "local_curator",
       note: "Semua AI (Gemini, Grok, OpenRouter) tidak dapat dijangkau atau quota habis. Pastikan OPENROUTER_API_KEY sudah ditambahkan di .env.local untuk fallback otomatis.",
+      quota: quotaInfo,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Internal server error";
