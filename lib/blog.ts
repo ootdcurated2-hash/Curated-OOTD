@@ -39,3 +39,19 @@ export function estimateReadingTime(content: string): number {
   const words = content.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
 }
+
+/**
+ * Normalizes image URLs, specifically converting Pexels web page links
+ * to direct CDN image URLs so they render properly in <img> tags.
+ */
+export function normalizeBlogImageUrl(url: string | null | undefined): string {
+  if (!url) return "";
+  const trimmed = url.trim();
+  // Match pexels.com/photo/...-12345/ or pexels.com/photo/12345/
+  const pexelsMatch = trimmed.match(/pexels\.com\/photo\/(?:[^\/]+-)?(\d+)\/?/i);
+  if (pexelsMatch && pexelsMatch[1]) {
+    const id = pexelsMatch[1];
+    return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1200`;
+  }
+  return trimmed;
+}

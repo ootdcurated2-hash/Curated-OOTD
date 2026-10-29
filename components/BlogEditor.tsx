@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { generateSlug } from "@/lib/blog";
+import { generateSlug, normalizeBlogImageUrl } from "@/lib/blog";
 import {
   Save,
   Eye,
@@ -78,9 +78,13 @@ export default function BlogEditor({ initialPost }: Props) {
   } | null>(null);
   const [preview, setPreview] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingContentImage, setUploadingContentImage] = useState(false);
   const [activeFormats, setActiveFormats] = useState<Record<string, boolean>>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
+  const contentImageInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const isInternalChangeRef = useRef(false);
 
@@ -166,9 +170,86 @@ export default function BlogEditor({ initialPost }: Props) {
   };
 
   const handleInsertImage = () => {
-    const url = prompt("Masukkan URL gambar:", "https://");
-    if (url && url !== "https://") {
-      execCmd("insertImage", url);
+    const choice = confirm(
+      "Klik OK untuk UPLOAD FOTO dari perangkat komputer/HP ini.\nAtau klik CANCEL jika ingin memasukkan LINK URL gambar."
+    );
+    if (choice) {
+      contentImageInputRef.current?.click();
+    } else {
+      const url = prompt("Masukkan URL gambar:", "https://");
+      if (url && url !== "https://") {
+        execCmd("insertImage", normalizeBlogImageUrl(url));
+      }
+    }
+  };
+
+  const handleUploadContentImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showToast("error", "Harap pilih file gambar (JPG, PNG, WebP)!");
+      return;
+    }
+
+    setUploadingContentImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Gagal mengunggah gambar");
+      }
+
+      execCmd("insertImage", data.url);
+      showToast("success", "Gambar berhasil diunggah ke dalam konten!");
+    } catch (err: unknown) {
+      console.error(err);
+      showToast("error", (err as Error).message || "Gagal mengunggah gambar");
+    } finally {
+      setUploadingContentImage(false);
+      if (contentImageInputRef.current) contentImageInputRef.current.value = "";
+    }
+  };
+
+  const handleUploadCoverImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showToast("error", "Harap pilih file gambar (JPG, PNG, WebP)!");
+      return;
+    }
+
+    setUploadingCover(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Gagal mengunggah foto cover");
+      }
+
+      setForm((f) => ({ ...f, cover_image: data.url }));
+      showToast("success", "Foto cover berhasil diunggah!");
+    } catch (err: unknown) {
+      console.error(err);
+      showToast("error", (err as Error).message || "Gagal mengunggah foto cover");
+    } finally {
+      setUploadingCover(false);
+      if (coverImageInputRef.current) coverImageInputRef.current.value = "";
     }
   };
 
@@ -701,13 +782,25 @@ export default function BlogEditor({ initialPost }: Props) {
                     >
                       <Link2 className="h-4 w-4" />
                     </button>
+                    <input
+                      ref={contentImageInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleUploadContentImage}
+                    />
                     <button
                       type="button"
                       onClick={handleInsertImage}
-                      title="Sisipkan Gambar dari URL"
-                      className="p-1.5 rounded text-gray-300 hover:text-white hover:bg-white/15 transition-all"
+                      disabled={uploadingContentImage}
+                      title="Sisipkan Gambar (Upload dari Perangkat atau dari Link URL)"
+                      className="p-1.5 rounded text-gray-300 hover:text-white hover:bg-white/15 transition-all disabled:opacity-50"
                     >
-                      <ImageIcon className="h-4 w-4" />
+                      {uploadingContentImage ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      ) : (
+                        <ImageIcon className="h-4 w-4" />
+                      )}
                     </button>
                     <button
                       type="button"
@@ -850,25 +943,64 @@ export default function BlogEditor({ initialPost }: Props) {
             <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
               <ImageIcon className="h-3.5 w-3.5" /> Gambar Cover
             </h3>
-            <input
-              type="url"
-              value={form.cover_image}
-              onChange={(e) => setForm((f) => ({ ...f, cover_image: e.target.value }))}
-              placeholder="https://..."
-              className="w-full text-xs bg-secondary/50 border border-border rounded-xl px-3 py-2 outline-none focus:border-primary text-foreground placeholder:text-muted-foreground/50"
-            />
+
+            {/* Input URL atau Upload File */}
+            <div className="space-y-2">
+              <input
+                type="url"
+                value={form.cover_image}
+                onChange={(e) => setForm((f) => ({ ...f, cover_image: e.target.value }))}
+                placeholder="Masukkan URL (https://...)"
+                className="w-full text-xs bg-secondary/50 border border-border rounded-xl px-3 py-2 outline-none focus:border-primary text-foreground placeholder:text-muted-foreground/50"
+              />
+
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground font-bold uppercase">atau</span>
+                <input
+                  ref={coverImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleUploadCoverImage}
+                />
+                <button
+                  type="button"
+                  onClick={() => coverImageInputRef.current?.click()}
+                  disabled={uploadingCover}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-all disabled:opacity-50"
+                >
+                  {uploadingCover ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>Mengunggah...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-3.5 w-3.5" />
+                      <span>Upload dari Perangkat</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
             {form.cover_image && (
-              <div className="relative rounded-xl overflow-hidden h-32">
+              <div className="relative rounded-xl overflow-hidden h-36 border border-border/80 bg-secondary/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={form.cover_image}
+                  src={normalizeBlogImageUrl(form.cover_image)}
                   alt="Cover preview"
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src =
+                      "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='12'/%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'/%3E%3C/svg%3E";
+                  }}
                 />
                 <button
                   type="button"
                   onClick={() => setForm((f) => ({ ...f, cover_image: "" }))}
-                  className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white text-foreground"
+                  className="absolute top-2 right-2 p-1 rounded-full bg-black/60 hover:bg-black/80 text-white transition-colors"
+                  title="Hapus Cover"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>

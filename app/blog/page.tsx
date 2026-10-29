@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Metadata } from "next";
-import { formatDate, estimateReadingTime } from "@/lib/blog";
+import { formatDate, estimateReadingTime, normalizeBlogImageUrl } from "@/lib/blog";
 import { BookOpen, Clock, CalendarDays, Tag, ArrowRight, Rss } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -81,7 +81,7 @@ export default async function BlogPage() {
                     <div className="relative h-56 md:h-auto overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={featured.cover_image}
+                        src={normalizeBlogImageUrl(featured.cover_image)}
                         alt={featured.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -148,7 +148,7 @@ export default async function BlogPage() {
                         <div className="relative h-44 overflow-hidden">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={post.cover_image}
+                            src={normalizeBlogImageUrl(post.cover_image)}
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />

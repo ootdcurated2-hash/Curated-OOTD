@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
-import { formatDate, estimateReadingTime } from "@/lib/blog";
+import { formatDate, estimateReadingTime, normalizeBlogImageUrl } from "@/lib/blog";
 import {
   ArrowLeft,
   CalendarDays,
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: data.title,
       description: data.excerpt ?? "",
-      images: data.cover_image ? [{ url: data.cover_image }] : [],
+      images: data.cover_image ? [{ url: normalizeBlogImageUrl(data.cover_image) }] : [],
       type: "article",
     },
     twitter: {
@@ -72,28 +72,32 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <main className="min-h-screen">
-      {/* Cover Image */}
-      {post.cover_image && (
-        <div className="relative w-full h-56 sm:h-80 md:h-96 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.cover_image}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-        </div>
-      )}
-
-      <div className="container max-w-3xl px-4 sm:px-6 py-8">
-        {/* Back */}
+      {/* Back button on top */}
+      <div className="container max-w-4xl px-4 sm:px-6 pt-6 pb-2">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-1.5 text-xs font-black text-muted-foreground hover:text-foreground transition-colors mb-8 group"
+          className="inline-flex items-center gap-1.5 text-xs font-black text-muted-foreground hover:text-foreground transition-colors group"
         >
           <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
           Kembali ke Blog
         </Link>
+      </div>
+
+      {/* Cover Image - Compact & Framed */}
+      {post.cover_image && (
+        <div className="container max-w-4xl px-4 sm:px-6 pt-2 pb-6">
+          <div className="relative w-full max-h-[380px] sm:max-h-[420px] rounded-3xl overflow-hidden cartoon-card bg-secondary/30 shadow-cartoon-sm flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={normalizeBlogImageUrl(post.cover_image)}
+              alt={post.title}
+              className="w-full h-auto max-h-[380px] sm:max-h-[420px] object-cover object-center"
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="container max-w-3xl px-4 sm:px-6 py-4">
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1.5 mb-5">
