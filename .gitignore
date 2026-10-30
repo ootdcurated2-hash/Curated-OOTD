@@ -47,3 +47,15 @@ next-env.d.ts
 
 # docs - jangan di-push ke GitHub (dokumen internal)
 /docs/
+
+# OpenNext
+.open-next
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+
+# Daftar secret Cloudflare (dipakai `wrangler secret bulk`) — BERISI KUNCI RAHASIA
+secrets.*.json
+cf-secrets.json

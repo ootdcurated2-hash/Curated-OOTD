@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import nodemailer from "nodemailer";
+import { buildOtpEmailHtml, isEmailConfigured, sendEmail } from "@/lib/email";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-const GMAIL_USER = process.env.GMAIL_USER || "ootdcurated@gmail.com";
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 
 function getSupabaseAdmin() {
   return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -16,8 +13,6 @@ function getSupabaseAdmin() {
 
 export async function POST(req: NextRequest) {
   try {
-    const gmailUser = (process.env.GMAIL_USER || "ootdcurated@gmail.com").trim();
-    const gmailPassword = (process.env.GMAIL_APP_PASSWORD || "").trim();
     const body = await req.json();
     const { email, password, username, displayName, avatarUrl } = body;
 
@@ -75,64 +70,54 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Kirim email via Gmail SMTP jika gmailPassword telah dikonfigurasi
-    if (gmailPassword) {
-      try {
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: gmailUser,
-            pass: gmailPassword,
-          },
-        });
-
-        await transporter.sendMail({
-          from: `"Curated OOTD" <${gmailUser}>`,
-          to: cleanEmail,
-          subject: `${otp} adalah Kode Verifikasi Curated OOTD Anda`,
-          html: `
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; border: 1px solid #fed7e2; border-radius: 16px; background-color: #fff;">
-              <div style="text-align: center; margin-bottom: 20px;">
-                <h1 style="color: #ff2b85; margin: 0; font-size: 24px; font-weight: 900;">Curated OOTD</h1>
-                <p style="color: #718096; font-size: 13px; margin-top: 4px;">Pusat Inspirasi Fashion & Koleksi Gaya</p>
-              </div>
-              <p style="color: #2d3748; font-size: 14px; font-weight: 600;">Halo <strong>${displayName || username}</strong>,</p>
-              <p style="color: #4a5568; font-size: 13px; line-height: 1.6;">Terima kasih telah mendaftar di Curated OOTD. Gunakan kode verifikasi (OTP) berikut untuk menyelesaikan pembuatan akun Anda:</p>
-              <div style="text-align: center; margin: 28px 0;">
-                <span style="display: inline-block; font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #ff2b85; background: #fff1f5; border: 2px dashed #ff2b85; padding: 12px 28px; border-radius: 12px;">
-                  ${otp}
-                </span>
-              </div>
-              <p style="color: #a0aec0; font-size: 11px; text-align: center; margin-top: 24px;">Kode ini hanya berlaku selama 10 menit. Jangan bagikan kode ini kepada siapa pun.</p>
-            </div>
-          `,
-        });
-
-        return NextResponse.json({
-          success: true,
-          message: `Kode OTP berhasil dikirim ke ${cleanEmail}`,
-        });
-      } catch (mailError: any) {
-        console.error("Gagal mengirim email via Gmail SMTP:", mailError);
-        // Jika gagal mengirim via SMTP, kembalikan OTP dalam mode dev/fallback
-        return NextResponse.json({
-          success: true,
-          devOtp: otp,
-          message: `Kode OTP Anda: ${otp} (Pengiriman Gmail memerlukan App Password di .env.local)`,
-        });
-      }
+    // 2. Kirim email lewat Gmail API (HTTPS) — SMTP tidak tersedia di Cloudflare Workers
+    if (!isEmailConfigured()) {
+      console.error("[send-otp] kredensial Gmail API belum diisi — email verifikasi tidak dikirim");
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Layanan email belum aktif. Silakan coba beberapa saat lagi atau hubungi admin.",
+          // Kode HANYA dikembalikan saat dev — jangan pernah bocorkan OTP di production
+          ...(process.env.NODE_ENV !== "production" ? { devOtp: otp } : {}),
+        },
+        { status: 503 }
+      );
     }
 
-    // Fallback jika belum pasang GMAIL_APP_PASSWORD di .env.local:
-    // Beritahukan kode langsung ke user agar pendaftaran TIDAK pernah macet!
+    const sent = await sendEmail({
+      to: cleanEmail,
+      subject: `${otp} adalah Kode Verifikasi Curated OOTD Anda`,
+      html: buildOtpEmailHtml({
+        otp,
+        recipientName: displayName || username,
+        intro:
+          "Terima kasih telah mendaftar di Curated OOTD. Gunakan kode verifikasi (OTP) berikut untuk menyelesaikan pembuatan akun Anda:",
+      }),
+    });
+
+    if (!sent.ok) {
+      console.error("[send-otp] gagal kirim email:", sent.error);
+      return NextResponse.json(
+        { success: false, message: "Kode OTP gagal dikirim. Periksa alamat email lalu coba lagi." },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      devOtp: otp,
-      message: `Kode verifikasi OTP Anda adalah ${otp}.`,
+      message: `Kode OTP berhasil dikirim ke ${cleanEmail}`,
     });
-  } catch (err: any) {
+  } catch (err) {
+    console.error("POST /api/auth/send-otp error:", err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Terjadi kesalahan pada server." },
+      {
+        success: false,
+        message:
+          err instanceof Error && err.message
+            ? err.message
+            : "Terjadi kesalahan pada server.",
+      },
       { status: 500 }
     );
   }
