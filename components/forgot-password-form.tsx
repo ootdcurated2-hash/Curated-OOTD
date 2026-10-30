@@ -22,7 +22,8 @@ export function ForgotPasswordForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState(["", "", "", "", "", "", "", ""]);
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
+  const [otpLength, setOtpLength] = useState(6);
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +60,10 @@ export function ForgotPasswordForm({
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
+      if (typeof data.otpLength === "number") {
+        setOtpLength(data.otpLength);
+        setOtp(Array(data.otpLength).fill(""));
+      }
       setStep("otp");
       setResendCooldown(60);
       // Dev fallback: tampilkan OTP di konsol saja
@@ -102,7 +107,7 @@ export function ForgotPasswordForm({
     const next = [...otp];
     next[index] = cleaned;
     setOtp(next);
-    if (cleaned && index < 7) otpRefs.current[index + 1]?.focus();
+    if (cleaned && index < otpLength - 1) otpRefs.current[index + 1]?.focus();
   };
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -116,20 +121,20 @@ export function ForgotPasswordForm({
     const digits = e.clipboardData
       .getData("text")
       .replace(/\D/g, "")
-      .slice(0, 8)
+      .slice(0, otpLength)
       .split("");
     const next = [...otp];
     digits.forEach((d, i) => { next[i] = d; });
     setOtp(next);
-    otpRefs.current[Math.min(digits.length, 7)]?.focus();
+    otpRefs.current[Math.min(digits.length, otpLength - 1)]?.focus();
   };
 
   // ── Step 2: Verifikasi OTP + Reset Password ────────────────────────────────
   const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const otpString = otp.join("");
-    if (otpString.length !== 8) {
-      setError("Masukkan 8 digit kode verifikasi.");
+    if (otpString.length !== otpLength) {
+      setError(`Masukkan ${otpLength} digit kode verifikasi.`);
       return;
     }
     if (!isPasswordValid) {
@@ -224,7 +229,7 @@ export function ForgotPasswordForm({
               Masukkan Kode OTP
             </CardTitle>
             <CardDescription className="text-xs font-bold text-foreground/70 leading-relaxed">
-              Kode 8 digit telah dikirimkan ke{" "}
+              Kode {otpLength} digit telah dikirimkan ke{" "}
               <span className="text-primary">{email}</span>
             </CardDescription>
           </CardHeader>
@@ -332,14 +337,14 @@ export function ForgotPasswordForm({
               <button
                 type="submit"
                 className="cartoon-btn w-full bg-primary text-white py-3 text-sm font-black disabled:opacity-50"
-                disabled={isLoading || otp.join("").length !== 8 || !isPasswordValid}
+                disabled={isLoading || otp.join("").length !== otpLength || !isPasswordValid}
               >
                 {isLoading ? "Menyimpan..." : "Atur Ulang Kata Sandi"}
               </button>
 
               <button
                 type="button"
-                onClick={() => { setStep("email"); setError(null); setOtp(["", "", "", "", "", "", "", ""]); }}
+                onClick={() => { setStep("email"); setError(null); setOtp(Array(otpLength).fill("")); }}
                 className="w-full text-center text-xs font-bold text-foreground/60 hover:text-primary transition-colors"
               >
                 ← Ganti Email

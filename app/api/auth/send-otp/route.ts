@@ -5,8 +5,8 @@ import nodemailer from "nodemailer";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-const GMAIL_USER = process.env.GMAIL_USER || "ootdcurated@gmail.com";
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
+const GMAIL_USER = (process.env.GMAIL_USER || "ootdcurated2@gmail.com").trim();
+const GMAIL_APP_PASSWORD = (process.env.GMAIL_APP_PASSWORD || "").trim();
 
 function getSupabaseAdmin() {
   return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -16,8 +16,8 @@ function getSupabaseAdmin() {
 
 export async function POST(req: NextRequest) {
   try {
-    const gmailUser = (process.env.GMAIL_USER || "ootdcurated@gmail.com").trim();
-    const gmailPassword = (process.env.GMAIL_APP_PASSWORD || "").trim();
+    const gmailUser = GMAIL_USER;
+    const gmailPassword = GMAIL_APP_PASSWORD;
     const body = await req.json();
     const { email, password, username, displayName, avatarUrl } = body;
 
@@ -67,7 +67,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const otp = linkData?.properties?.email_otp;
+    // Supabase menaruh kode di top-level (`email_otp`); `properties` kosong pada
+    // beberapa versi, jadi kedua posisi dibaca agar tidak gagal senyap.
+    const link = linkData as
+      | (NonNullable<typeof linkData> & { email_otp?: string })
+      | null;
+    const otp = link?.email_otp ?? link?.properties?.email_otp;
     if (!otp) {
       return NextResponse.json(
         { success: false, message: "Gagal membuat kode OTP verifikasi." },
@@ -112,7 +117,7 @@ export async function POST(req: NextRequest) {
           success: true,
           message: `Kode OTP berhasil dikirim ke ${cleanEmail}`,
         });
-      } catch (mailError: any) {
+      } catch (mailError: unknown) {
         console.error("Gagal mengirim email via Gmail SMTP:", mailError);
         // Jika gagal mengirim via SMTP, kembalikan OTP dalam mode dev/fallback
         return NextResponse.json({
@@ -130,9 +135,13 @@ export async function POST(req: NextRequest) {
       devOtp: otp,
       message: `Kode verifikasi OTP Anda adalah ${otp}.`,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    console.error("POST /api/auth/send-otp error:", err);
     return NextResponse.json(
-      { success: false, message: err?.message || "Terjadi kesalahan pada server." },
+      {
+        success: false,
+        message: err instanceof Error ? err.message : "Terjadi kesalahan pada server.",
+      },
       { status: 500 }
     );
   }

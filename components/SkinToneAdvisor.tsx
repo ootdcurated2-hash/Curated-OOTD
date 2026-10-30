@@ -32,6 +32,8 @@ interface SkinToneAdvisorProps {
 type SourceType =
   | "grok_ai"
   | "gemini_ai"
+  | "groq_ai"
+  | "openai"
   | "nvidia_ai"
   | "recursive_ai"
   | "dots_ai"
@@ -44,6 +46,9 @@ type SourceType =
   | (string & {})
   | null;
 
+/** Sumber jawaban yang BUKAN datang dari AI cloud */
+const LOCAL_SOURCES = new Set(["preset", "fallback", "local_curator"]);
+
 export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps) {
   const [query, setQuery] = useState("");
   const [activeSkinKey, setActiveSkinKey] = useState<string>("cokelat");
@@ -52,6 +57,8 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
   const [source, setSource] = useState<SourceType>(null);
   const [error, setError] = useState<string | null>(null);
   const [apiNote, setApiNote] = useState<string | null>(null);
+  const [providerLabel, setProviderLabel] = useState<string | null>(null);
+  const [aiModel, setAiModel] = useState<string | null>(null);
 
   // Status Kuota Harian (10 pertanyaan / hari untuk role user)
   const [quota, setQuota] = useState<AIQuotaStatus>({
@@ -131,6 +138,8 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
         setResult(json.data);
         setSource(json.source || "fallback");
         setApiNote(json.note || null);
+        setProviderLabel(json.providerLabel || null);
+        setAiModel(json.model || null);
         if (json.data.skinToneKey && json.data.skinToneKey !== "custom") {
           setActiveSkinKey(json.data.skinToneKey);
         }
@@ -169,6 +178,8 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
         const fallback = getConsultationResponse(textToQuery);
         setResult(fallback);
         setSource("fallback");
+        setProviderLabel(null);
+        setAiModel(null);
         setActiveSkinKey(fallback.skinToneKey);
       }
     } catch (err) {
@@ -176,6 +187,8 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
       const fallback = getConsultationResponse(textToQuery);
       setResult(fallback);
       setSource("fallback");
+      setProviderLabel(null);
+      setAiModel(null);
       setActiveSkinKey(fallback.skinToneKey);
       setError("Gagal menghubungi AI. Menampilkan rekomendasi dari basis data lokal.");
     } finally {
@@ -189,31 +202,19 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
     if (data) {
       setResult(data);
       setSource("preset");
+      setApiNote(null);
+      setProviderLabel(null);
+      setAiModel(null);
       setQuery(""); // Clear query when selecting preset
     }
   };
 
-  const isFromAI = Boolean(
-    source &&
-      (source === "grok_ai" ||
-        source === "gemini_ai" ||
-        source === "nvidia_ai" ||
-        source === "recursive_ai" ||
-        source === "dots_ai" ||
-        source.includes("ai"))
-  );
-  const aiBadgeLabel =
-    source === "gemini_ai"
-      ? "Analisis Gemini AI"
-      : source === "grok_ai"
-        ? "Analisis Grok AI"
-        : source === "nvidia_ai"
-          ? "Analisis NVIDIA Nemotron AI"
-          : isFromAI
-            ? "Analisis Cloud AI"
-            : source === "local_curator" || source === "fallback"
-              ? "Penasihat Gaya Fashion"
-              : "Preset Warna Kulit";
+  const isFromAI = Boolean(source && !LOCAL_SOURCES.has(source));
+  const aiBadgeLabel = isFromAI
+    ? `Analisis ${providerLabel || "Cloud AI"}`
+    : source === "local_curator" || source === "fallback"
+      ? "Penasihat Gaya Fashion"
+      : "Preset Warna Kulit";
 
   return (
     <div id="advisor" className="cartoon-card bg-white/40 p-6 sm:p-10 space-y-8 backdrop-blur-2xl border-white/40 relative">
@@ -308,7 +309,9 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
             {result && source !== "preset" ? "Laporan Gaya AI" : "Panduan Warna Kulit & Gaya"}
           </h2>
           <p className="text-sm sm:text-base font-bold text-foreground/60 leading-relaxed">
-            Dapatkan rekomendasi outfit dipersonalisasi dengan Gemini AI (gratis) atau Grok sebagai cadangan.
+            Rekomendasi outfit dipersonalisasi oleh AI gratis. Bila kuota Gemini atau Grok
+            sedang habis, jawaban otomatis dialihkan ke AI lain (Groq, DeepSeek, Qwen,
+            ChatGPT, dst.) — kamu tidak perlu menekan ulang.
           </p>
         </div>
 
@@ -346,6 +349,23 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
             onClick={() => setQuotaNotification(null)}
             className="p-1 text-foreground/40 hover:text-foreground rounded-lg"
             aria-label="Tutup notifikasi"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* ── Banner Info Beralih AI (kuota habis → otomatis pakai AI lain) ── */}
+      {apiNote && !loading && (
+        <div className="flex items-start justify-between gap-3 p-3.5 rounded-2xl border border-accent/25 bg-accent/5 text-foreground text-xs font-bold animate-in fade-in slide-in-from-top-1">
+          <div className="flex items-start gap-2.5">
+            <Bot className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+            <span>{apiNote}</span>
+          </div>
+          <button
+            onClick={() => setApiNote(null)}
+            className="p-1 text-foreground/40 hover:text-foreground rounded-lg"
+            aria-label="Tutup info AI"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -396,7 +416,7 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
         {result && (
           <div className="flex flex-wrap items-center gap-2.5 text-xs">
             <span className="text-foreground/60 font-black uppercase tracking-widest text-[10px]">Topik Populer:</span>
-            {result.quickPrompts.slice(0, 3).map((prompt, idx) => (
+            {(result.quickPrompts ?? []).slice(0, 3).map((prompt, idx) => (
               <button
                 key={idx}
                 onClick={() => { setQuery(prompt); handleAsk(prompt); }}
@@ -460,7 +480,15 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
               isFromAI ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"
             }`}>
               {isFromAI ? (
-                <><Bot className="h-3.5 w-3.5" /> {aiBadgeLabel}</>
+                <>
+                  <Bot className="h-3.5 w-3.5" />
+                  {aiBadgeLabel}
+                  {aiModel && (
+                    <span className="hidden sm:inline font-mono normal-case tracking-normal opacity-70">
+                      · {aiModel}
+                    </span>
+                  )}
+                </>
               ) : (
                 <><BookOpen className="h-3.5 w-3.5" /> {aiBadgeLabel}</>
               )}
@@ -481,9 +509,9 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
               <span className="text-xs font-black uppercase tracking-widest text-foreground">
                 Palet Rekomendasi
               </span>
-              {onApplyPalette && (
+              {onApplyPalette && (result.tips?.colorPalette?.length ?? 0) > 0 && (
                 <button
-                  onClick={() => onApplyPalette(result.tips.colorPalette.map(c => c.hex))}
+                  onClick={() => onApplyPalette((result.tips?.colorPalette ?? []).map((c) => c.hex))}
                   className="text-[11px] font-black text-primary hover:underline underline-offset-4"
                 >
                   Terapkan ke Studio &rarr;
@@ -491,7 +519,7 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
               )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 pt-2">
-              {result.tips.colorPalette.map((color, idx) => (
+              {(result.tips?.colorPalette ?? []).map((color, idx) => (
                 <div key={idx} className="flex flex-col items-center p-3 rounded-2xl border border-border bg-white text-center shadow-cartoon-sm hover:scale-105 transition-all">
                   <div className="h-12 w-full rounded-xl border border-border/50 shadow-inner" style={{ backgroundColor: color.hex }} />
                   <span className="mt-2 text-[10px] font-black line-clamp-1 text-foreground leading-tight">{color.name}</span>
@@ -505,9 +533,9 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="rounded-[2rem] border border-border bg-white/80 p-6 space-y-4 shadow-cartoon-sm">
               <h4 className="text-xs font-black uppercase tracking-widest text-foreground">Panduan Gaya</h4>
-              <p className="text-sm font-bold text-foreground/70 leading-relaxed">{result.tips.advice}</p>
+              <p className="text-sm font-bold text-foreground/70 leading-relaxed">{result.tips?.advice}</p>
               <div className="pt-2 flex flex-wrap gap-2">
-                {result.tips.recommendedStyles.map((style, i) => (
+                {(result.tips?.recommendedStyles ?? []).map((style, i) => (
                   <span key={i} className="rounded-full border border-border bg-accent/10 px-4 py-1 text-[11px] font-black text-accent shadow-cartoon-sm">
                     #{style}
                   </span>
@@ -515,7 +543,7 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
               </div>
             </div>
 
-            {result.tips.avoidColors && result.tips.avoidColors.length > 0 && (
+            {result.tips?.avoidColors && result.tips.avoidColors.length > 0 && (
               <div className="rounded-[2rem] border border-border bg-white/80 p-6 space-y-4 shadow-cartoon-sm">
                 <h4 className="text-xs font-black uppercase tracking-widest text-primary">Yang Dihindari</h4>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -531,7 +559,7 @@ export default function SkinToneAdvisor({ onApplyPalette }: SkinToneAdvisorProps
           </div>
 
           {/* Example Pieces — only if AI returned them */}
-          {result.tips.examplePieces && result.tips.examplePieces.length > 0 && (
+          {result.tips?.examplePieces && result.tips.examplePieces.length > 0 && (
             <div className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-widest text-foreground">
