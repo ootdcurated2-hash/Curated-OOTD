@@ -7,7 +7,12 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
+      // File verifikasi Google Site Verification harus boleh diakses crawler.
+      allow: [
+        "/",
+        "/google78e89bd93974faf4.html",
+        "/google20edaadf71d53857.html",
+      ],
       // Halaman privat / area admin tidak boleh diindeks.
       disallow: ["/admin", "/admin/", "/api/", "/auth/", "/protected"],
     },

@@ -35,6 +35,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.6,
     },
+    // File verifikasi Google Site Verification (ikut terdaftar agar mudah diverifikasi).
+    {
+      url: `${baseUrl}/google78e89bd93974faf4.html`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.1,
+    },
   ];
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
