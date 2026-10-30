@@ -4,12 +4,6 @@ const nextConfig: NextConfig = {
   // cacheComponents and partialPrefetching removed — these experimental flags
   // cause strict prerender errors with Date.now(), new Date(), cookies(), etc.
   // and are not needed for production stability.
-  // Cloudflare Workers (OpenNext) tidak punya image optimizer bawaan seperti
-  // Netlify/Vercel. Karena hanya 1 komponen yang memakai next/image dan asetnya
-  // lokal, optimasi dimatikan agar tidak ada request /_next/image yang gagal.
-  images: {
-    unoptimized: true,
-  },
   async headers() {
     return [
       {

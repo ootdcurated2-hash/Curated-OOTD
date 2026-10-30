@@ -28,7 +28,5 @@ export async function GET(request: NextRequest) {
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(
-    `${origin}/auth/error?error=Tautan%20login%20tidak%20valid%20atau%20sudah%20kedaluwarsa`
-  );
+  return NextResponse.redirect(`${origin}/auth/error?error=Gagal%20masuk%20dengan%20Google`);
 }

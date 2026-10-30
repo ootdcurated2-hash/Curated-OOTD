@@ -62,7 +62,7 @@ const faqs = [
       },
       {
         q: "Bagaimana cara login/daftar akun?",
-        a: "Klik tombol 'Masuk' di navigasi atas atau bawah (mobile). Daftar akun baru memakai email, lalu masuk dengan email/username dan kata sandi yang sudah dibuat.",
+        a: "Klik tombol 'Masuk' di navigasi atas atau bawah (mobile). Kamu bisa daftar dengan email atau login menggunakan akun Google.",
       },
     ],
   },
