@@ -127,6 +127,13 @@ export default function AdminNotificationBell() {
     if (!notification.is_read) {
       await markAsRead({ ids: [notification.id] });
     }
+
+    // Notifikasi catatan blog diarahkan ke fitur Catatan, bukan ke Ulasan/Testimoni
+    if (notification.type === "blog_feedback_pending") {
+      router.push("/admin/catatan?highlight=pending");
+      return;
+    }
+
     if (notification.review_id) {
       window.dispatchEvent(
         new CustomEvent(HIGHLIGHT_EVENT, { detail: notification.review_id })
@@ -142,7 +149,7 @@ export default function AdminNotificationBell() {
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        aria-label={`Notifikasi testimoni${unreadCount > 0 ? `, ${unreadCount} belum dibaca` : ""}`}
+        aria-label={`Notifikasi${unreadCount > 0 ? `, ${unreadCount} belum dibaca` : ""}`}
         aria-expanded={isOpen}
         className="relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white/60 text-foreground shadow-cartoon-sm backdrop-blur-md transition-all hover:bg-secondary hover:shadow-cartoon active:scale-95"
       >
@@ -158,7 +165,7 @@ export default function AdminNotificationBell() {
         <div className="absolute right-0 z-50 mt-2 w-[19rem] max-w-[calc(100vw-1.5rem)] rounded-[1.5rem] border border-white/40 bg-white/80 shadow-cartoon-lg backdrop-blur-xl">
           <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2.5">
             <p className="text-xs font-black font-nunito text-foreground">
-              Notifikasi Testimoni
+              Notifikasi Masuk
             </p>
             {unreadCount > 0 && (
               <button
@@ -196,7 +203,7 @@ export default function AdminNotificationBell() {
                   Belum ada notifikasi
                 </p>
                 <p className="text-[10px] font-semibold text-foreground/60">
-                  Testimoni baru dari pengguna akan muncul di sini.
+                  Testimoni dan catatan artikel baru akan muncul di sini.
                 </p>
               </div>
             ) : (

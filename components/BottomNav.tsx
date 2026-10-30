@@ -9,7 +9,6 @@ import {
   ShoppingBag,
   Heart,
   User,
-  Sparkles,
 } from "lucide-react";
 import { getWishlist, WISHLIST_UPDATED_EVENT } from "@/lib/wishlist";
 import { getCartCount, CART_UPDATED_EVENT } from "@/lib/cart";
@@ -25,6 +24,7 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
   const [wishlistCount, setWishlistCount] = useState<number>(0);
   const [cartCount, setCartCount] = useState<number>(0);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!initialIsLoggedIn);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   // Sync wishlist & cart badges
   useEffect(() => {
@@ -46,27 +46,29 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
 
   // Check auth status
   useEffect(() => {
-    if (typeof initialIsLoggedIn === "boolean") {
-      setIsLoggedIn(initialIsLoggedIn);
-      return;
-    }
+    // Cek admin cookie di client
+    const hasAdmin =
+      typeof document !== "undefined" &&
+      document.cookie.includes("admin_session=adminootd_authenticated");
 
-    const checkAuth = async () => {
-      const hasAdmin =
-        typeof document !== "undefined" &&
-        document.cookie.includes("admin_session=adminootd_authenticated");
-      if (hasAdmin) {
-        setIsLoggedIn(true);
-        return;
+    setIsAdmin(hasAdmin);
+    setIsLoggedIn(hasAdmin || !!initialIsLoggedIn);
+
+    // Subscribe ke perubahan auth Supabase (untuk user biasa login/logout)
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Hanya update saat ada event eksplisit, bukan initial INITIAL_SESSION
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+        const adminNow =
+          typeof document !== "undefined" &&
+          document.cookie.includes("admin_session=adminootd_authenticated");
+        setIsAdmin(adminNow);
+        setIsLoggedIn(!!session?.user || adminNow);
       }
+    });
 
-      const supabase = createClient();
-      const { data } = await supabase.auth.getUser();
-      setIsLoggedIn(!!data?.user);
-    };
-
-    checkAuth();
-  }, [initialIsLoggedIn, pathname]);
+    return () => subscription.unsubscribe();
+  }, [initialIsLoggedIn]);
 
   // Sembunyikan bottom nav di halaman auth atau admin jika diinginkan
   if (pathname?.startsWith("/auth") || pathname?.startsWith("/admin")) {
@@ -79,7 +81,7 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
   const isFavoritActive = pathname === "/wishlist";
   const isAkunActive = pathname === "/protected" || pathname === "/auth/login";
 
-  const accountHref = isLoggedIn ? "/protected" : "/auth/login";
+  const accountHref = isAdmin ? "/admin/settings" : isLoggedIn ? "/protected" : "/auth/login";
 
   const navItems = [
     {

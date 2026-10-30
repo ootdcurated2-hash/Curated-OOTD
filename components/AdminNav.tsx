@@ -10,6 +10,7 @@ import {
   Settings,
   FolderTree,
   BookOpen,
+  MessageSquareQuote,
 } from "lucide-react";
 
 export default function AdminNav() {
@@ -41,6 +42,11 @@ export default function AdminNav() {
       href: "/admin/blog",
       label: "Blog",
       icon: BookOpen,
+    },
+    {
+      href: "/admin/catatan",
+      label: "Catatan",
+      icon: MessageSquareQuote,
     },
     {
       href: "/admin/settings",

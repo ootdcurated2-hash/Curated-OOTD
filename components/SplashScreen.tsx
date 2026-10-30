@@ -23,11 +23,15 @@ export default function SplashScreen() {
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 
+    // Skip splash jika ada query param ?nosplash atau sudah ditampilkan di sesi ini
+    const params = new URLSearchParams(window.location.search);
+    const skipByParam = params.get("nosplash") === "1";
+
     // Tampilkan pada mode standalone atau jika belum pernah ditampilkan pada session
     const shown = sessionStorage.getItem("splash_shown");
     
     // Aktifkan untuk standalone atau kunjungan pertama sesi ini
-    if (!isStandalone && shown) {
+    if (skipByParam || (!isStandalone && shown)) {
       return () => observer.disconnect();
     }
 

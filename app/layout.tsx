@@ -57,12 +57,21 @@ import SplashScreen from "@/components/SplashScreen";
 import WishlistToast from "@/components/WishlistToast";
 import CartToast from "@/components/CartToast";
 import BottomNav from "@/components/BottomNav";
+import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const hasAdminCookie = cookieStore.get("admin_session")?.value === "adminootd_authenticated";
+
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const isLoggedIn = !!data?.claims || hasAdminCookie;
+
   return (
     <html lang="id">
       <body className={`${nunito.variable} ${jakarta.variable} ${jakarta.className} antialiased min-h-screen flex flex-col bg-background text-foreground`}>
@@ -77,7 +86,7 @@ export default function RootLayout({
         >
           {children}
         </LayoutWrapper>
-        <BottomNav />
+        <BottomNav initialIsLoggedIn={isLoggedIn} />
         <InstallPwaPrompt />
         <WishlistToast />
         <CartToast />

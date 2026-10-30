@@ -5,8 +5,10 @@ import {
   BarChart3,
   Sparkles,
   ExternalLink,
+  MessageSquareQuote,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { countPendingFeedback } from "@/lib/blogFeedback";
 import AdminOutfitList from "@/components/AdminOutfitList";
 import AdminStatsCards from "@/components/AdminStatsCards";
 
@@ -25,6 +27,9 @@ export default async function AdminDashboardPage() {
   const totalOutfits = outfits?.length ?? 0;
   const totalClicks = clicks?.length ?? 0;
   const safeClicks: { id: string; clicked_at: string }[] = clicks ?? [];
+
+  // Jumlah catatan pembaca yang menunggu persetujuan (fitur Catatan)
+  const pendingNotes = await countPendingFeedback();
 
   return (
     <main className="container max-w-7xl py-8 px-4 sm:px-6 space-y-8">
@@ -46,7 +51,7 @@ export default async function AdminDashboardPage() {
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/"
+              href="/?nosplash=1"
               target="_blank"
               className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white/80 backdrop-blur-md px-4 py-2 text-xs font-black text-foreground shadow-cartoon-sm hover:-translate-y-0.5 hover:shadow-cartoon transition-all"
             >
@@ -58,6 +63,18 @@ export default async function AdminDashboardPage() {
             >
               <BarChart3 className="h-4 w-4 text-primary" />
               Laporan Analitik
+            </Link>
+            <Link
+              href="/admin/catatan"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-2 text-xs font-black text-foreground shadow-cartoon-sm hover:-translate-y-0.5 hover:shadow-cartoon transition-all"
+            >
+              <MessageSquareQuote className="h-4 w-4 text-primary" />
+              Catatan
+              {pendingNotes > 0 && (
+                <span className="rounded-full bg-primary px-1.5 text-[10px] font-black text-white">
+                  {pendingNotes}
+                </span>
+              )}
             </Link>
             <Link
               href="/admin/outfit/new"

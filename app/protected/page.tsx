@@ -3,8 +3,16 @@ import { getUserProfile } from "@/lib/userServer";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ProfileEditor from "@/components/ProfileEditor";
+import { cookies } from "next/headers";
 
 export default async function ProtectedPage() {
+  // Admin yang login via cookie diarahkan ke halaman pengaturan admin
+  const cookieStore = await cookies();
+  const hasAdminCookie = cookieStore.get("admin_session")?.value === "adminootd_authenticated";
+  if (hasAdminCookie) {
+    redirect("/admin/settings");
+  }
+
   const profile = await getUserProfile();
 
   if (!profile) {

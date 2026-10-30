@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import { engage } from "@/lib/blogEngagement";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -11,6 +13,8 @@ import {
   User,
   BookOpen,
 } from "lucide-react";
+import BlogEngagement from "@/components/BlogEngagement";
+import BlogFeedbackList from "@/components/BlogFeedbackList";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -59,6 +63,32 @@ export default async function BlogPostPage({ params }: Props) {
     .maybeSingle();
 
   if (!post) notFound();
+
+  // Identitas pembaca untuk dialog catatan (tamu wajib verifikasi, anggota tidak)
+  const { data: userData } = await supabase.auth.getUser();
+  const reader = userData?.user ?? null;
+  const readerName = reader
+    ? String(
+        reader.user_metadata?.username ||
+          reader.user_metadata?.name ||
+          reader.email?.split("@")[0] ||
+          ""
+      )
+    : "";
+
+  // Increment view setiap artikel dibuka (user maupun admin).
+  // Request prefetch dari Next.js diabaikan agar hitungan tidak membengkak.
+  const hdrs = await headers();
+  const isPrefetch = hdrs.get("next-router-prefetch") === "1" || hdrs.get("purpose") === "prefetch";
+
+  let views = 0;
+  if (!isPrefetch) {
+    const stats = await engage(post.slug, "view");
+    views = stats.views;
+    if (!stats.ok && process.env.NODE_ENV !== "production") {
+      console.error("[blog/[slug]] gagal menyimpan view:", stats.error);
+    }
+  }
 
   const readTime = estimateReadingTime(post.content);
 
@@ -159,17 +189,28 @@ export default async function BlogPostPage({ params }: Props) {
         />
 
         {/* Footer */}
-        <div className="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
-            Ditulis oleh <span className="font-black text-foreground">{post.author_name ?? "Admin"}</span>
-          </p>
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:gap-2.5 transition-all"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Lihat Semua Artikel
-          </Link>
+        <div className="mt-12 pt-6 border-t border-border flex flex-col gap-5">
+          <BlogEngagement
+            slug={post.slug}
+            initialViews={views}
+            isGuest={!reader}
+            displayName={readerName}
+          />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <p className="text-xs text-muted-foreground">
+              Ditulis oleh <span className="font-black text-foreground">{post.author_name ?? "Admin"}</span>
+            </p>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:gap-2.5 transition-all"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Lihat Semua Artikel
+            </Link>
+          </div>
         </div>
+
+        {/* Catatan pembaca yang sudah disetujui admin */}
+        <BlogFeedbackList slug={post.slug} />
       </div>
     </main>
   );
