@@ -13,6 +13,7 @@ import {
 import { getWishlist, WISHLIST_UPDATED_EVENT } from "@/lib/wishlist";
 import { getCartCount, CART_UPDATED_EVENT } from "@/lib/cart";
 import { createClient } from "@/lib/supabase/client";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import GuestGuardLink from "@/components/GuestGuardLink";
 
 interface BottomNavProps {
@@ -56,16 +57,22 @@ export default function BottomNav({ initialIsLoggedIn }: BottomNavProps) {
 
     // Subscribe ke perubahan auth Supabase (untuk user biasa login/logout)
     const supabase = createClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      // Hanya update saat ada event eksplisit, bukan initial INITIAL_SESSION
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
-        const adminNow =
-          typeof document !== "undefined" &&
-          document.cookie.includes("admin_session=adminootd_authenticated");
-        setIsAdmin(adminNow);
-        setIsLoggedIn(!!session?.user || adminNow);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session | null) => {
+        // Hanya update saat ada event eksplisit, bukan initial INITIAL_SESSION
+        if (
+          event === "SIGNED_IN" ||
+          event === "SIGNED_OUT" ||
+          event === "TOKEN_REFRESHED"
+        ) {
+          const adminNow =
+            typeof document !== "undefined" &&
+            document.cookie.includes("admin_session=adminootd_authenticated");
+          setIsAdmin(adminNow);
+          setIsLoggedIn(!!session?.user || adminNow);
+        }
       }
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, [initialIsLoggedIn]);
