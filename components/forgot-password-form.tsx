@@ -27,6 +27,7 @@ export function ForgotPasswordForm({
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [infoMsg, setInfoMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -64,6 +65,8 @@ export function ForgotPasswordForm({
         setOtpLength(data.otpLength);
         setOtp(Array(data.otpLength).fill(""));
       }
+      // Tampilkan peringatan jika email ternyata gagal dikirim (dev fallback)
+      setInfoMsg(data.devOtp ? data.message : null);
       setStep("otp");
       setResendCooldown(60);
       // Dev fallback: tampilkan OTP di konsol saja
@@ -92,6 +95,7 @@ export function ForgotPasswordForm({
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
+      setInfoMsg(data.devOtp ? data.message : null);
       setResendCooldown(60);
       if (data.devOtp) console.info("[DEV] Resend OTP:", data.devOtp);
     } catch (err: unknown) {
@@ -265,10 +269,24 @@ export function ForgotPasswordForm({
                     className="text-xs font-bold text-primary hover:underline disabled:text-foreground/40 disabled:no-underline transition-colors"
                   >
                     {resendCooldown > 0
-                      ? `Kirim ulang dalam ${resendCooldown}d`
+                      ? `Kirim ulang dalam ${resendCooldown} detik`
                       : "Kirim ulang kode"}
                   </button>
                 </div>
+
+                {/* Petunjuk bila email OTP tidak kunjung datang */}
+                <div className="rounded-2xl border border-border/60 bg-amber-50/80 p-3 text-[11px] font-bold leading-relaxed text-amber-800">
+                  Tidak menerima email? Pastikan:
+                  <br />1. Email yang Anda masukkan sudah terdaftar sebagai akun (bukan alamat lain).
+                  <br />2. Cek folder Spam / Promosi di Gmail Anda.
+                  <br />3. Tunggu hingga 1 menit, lalu klik "Kirim ulang kode".
+                </div>
+
+                {infoMsg && (
+                  <div className="rounded-2xl border border-border bg-amber-100/70 p-3 text-xs font-black text-amber-900 shadow-cartoon-sm">
+                    {infoMsg}
+                  </div>
+                )}
               </div>
 
               {/* New Password */}

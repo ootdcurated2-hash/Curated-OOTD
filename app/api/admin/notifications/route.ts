@@ -131,3 +131,68 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+
+// ─── DELETE /api/admin/notifications ──────────────────────────
+// Menghapus notifikasi. Body: { ids: string[] } atau { id: string } atau { all: true }
+export async function DELETE(request: NextRequest) {
+  try {
+    const { isAdmin } = await getAdminContext();
+    if (!isAdmin) return adminOnly();
+
+    const db = getServiceClient();
+    if (!db) return notConfigured();
+
+    const body = await request.json().catch(() => null);
+
+    if (body?.all === true) {
+      const { error } = await db
+        .from("admin_notifications")
+        .delete()
+        .not("id", "is", null);
+
+      if (error) {
+        console.error("Gagal menghapus notifikasi:", error.message);
+        return NextResponse.json(
+          { success: false, message: "Notifikasi gagal dihapus." },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ success: true, message: "Semua notifikasi dihapus." });
+    }
+
+    const ids: string[] = Array.isArray(body?.ids)
+      ? body.ids.filter((value: unknown): value is string => typeof value === "string")
+      : typeof body?.id === "string"
+        ? [body.id]
+        : [];
+
+    if (ids.length === 0) {
+      return NextResponse.json(
+        { success: false, message: "id notifikasi wajib disertakan." },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await db
+      .from("admin_notifications")
+      .delete()
+      .in("id", ids);
+
+    if (error) {
+      console.error("Gagal menghapus notifikasi:", error.message);
+      return NextResponse.json(
+        { success: false, message: "Notifikasi gagal dihapus." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, message: "Notifikasi dihapus." });
+  } catch (error: any) {
+    console.error("DELETE /api/admin/notifications error:", error?.message || error);
+    return NextResponse.json(
+      { success: false, message: "Terjadi kesalahan saat menghapus notifikasi." },
+      { status: 500 }
+    );
+  }
+}

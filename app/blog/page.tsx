@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Metadata } from "next";
-import { formatDate, estimateReadingTime, normalizeBlogImageUrl } from "@/lib/blog";
-import { BookOpen, Clock, CalendarDays, Tag, ArrowRight, Rss } from "lucide-react";
+import { formatDate, normalizeBlogImageUrl } from "@/lib/blog";
+import { BookOpen, CalendarDays, Tag, ArrowRight, Rss } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Blog & Artikel Fashion | My Curated OOTD",
@@ -116,10 +116,6 @@ export default async function BlogPage() {
                         <CalendarDays className="h-3.5 w-3.5" />
                         {formatDate(featured.published_at || featured.created_at)}
                       </span>
-                      <span className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5" />
-                        {estimateReadingTime(featured.content)} menit baca
-                      </span>
                     </div>
                     <span className="inline-flex items-center gap-1.5 text-sm font-black text-primary group-hover:gap-3 transition-all">
                       Baca Artikel <ArrowRight className="h-4 w-4" />
@@ -181,10 +177,6 @@ export default async function BlogPage() {
                           <span className="flex items-center gap-1">
                             <CalendarDays className="h-3 w-3" />
                             {formatDate(post.published_at || post.created_at)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {estimateReadingTime(post.content)} mnt
                           </span>
                         </div>
                       </div>

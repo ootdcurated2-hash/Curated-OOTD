@@ -75,7 +75,7 @@ const guides = [
     iconBg: "bg-gray-600",
     steps: [
       "Klik menu 'Masuk' untuk login atau daftar akun baru.",
-      "Gunakan email atau akun Google untuk autentikasi.",
+      "Gunakan email untuk autentikasi.",
       "Setelah login, klik menu 'Akun' untuk melihat profil dan pengaturan.",
       "Kamu bisa logout melalui halaman Akun.",
     ],

@@ -21,18 +21,21 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll().filter((c) => (c.value ? c.value.length < 3072 : true));
+          // Jangan filter cookie auth Supabase (sb-*) — nilainya bisa > 3KB.
+          return request.cookies.getAll().filter(
+            (c) => c.name.startsWith("sb-") || (c.value ? c.value.length < 3072 : true)
+          );
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => {
-            if (value && value.length > 3072) return;
+            if (!name.startsWith("sb-") && value && value.length > 3072) return;
             request.cookies.set(name, value);
           });
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) => {
-            if (value && value.length > 3072) return;
+            if (!name.startsWith("sb-") && value && value.length > 3072) return;
             supabaseResponse.cookies.set(name, value, options);
           });
         },

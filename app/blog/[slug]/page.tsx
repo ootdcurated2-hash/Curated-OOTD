@@ -4,11 +4,10 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
-import { formatDate, estimateReadingTime, normalizeBlogImageUrl } from "@/lib/blog";
+import { formatDate, normalizeBlogImageUrl } from "@/lib/blog";
 import {
   ArrowLeft,
   CalendarDays,
-  Clock,
   Tag,
   User,
   BookOpen,
@@ -90,8 +89,6 @@ export default async function BlogPostPage({ params }: Props) {
     }
   }
 
-  const readTime = estimateReadingTime(post.content);
-
   // Process content — support basic HTML or plain text with line breaks
   const htmlContent = post.content.includes("<")
     ? post.content
@@ -156,10 +153,6 @@ export default async function BlogPostPage({ params }: Props) {
           <span className="flex items-center gap-1.5">
             <CalendarDays className="h-3.5 w-3.5" />
             {formatDate(post.published_at || post.created_at)}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
-            {readTime} menit baca
           </span>
           <span className="flex items-center gap-1.5">
             <BookOpen className="h-3.5 w-3.5" />

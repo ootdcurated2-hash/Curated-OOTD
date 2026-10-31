@@ -46,13 +46,17 @@ export async function createClient() {
     {
       cookies: {
         getAll() {
-          // Abaikan cookie abnormal yang ukurannya > 3000 byte agar tidak memicu HTTP 431
-          return cookieStore.getAll().filter((c) => (c.value ? c.value.length < 3072 : true));
+          // JANGAN pernah filter cookie auth Supabase (sb-*) — nilainya bisa > 3KB
+          // karena berisi session JSON utuh. Filter hanya untuk cookie abnormal lainnya.
+          return cookieStore.getAll().filter(
+            (c) => c.name.startsWith("sb-") || (c.value ? c.value.length < 3072 : true)
+          );
         },
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              if (value && value.length > 3072) return; // Lindungi agar cookie raksasa tidak diset
+              // Cookie sb-* wajib disimpan utuh, jika tidak sesi user hilang.
+              if (!name.startsWith("sb-") && value && value.length > 3072) return;
               cookieStore.set(name, value, options);
             });
           } catch {

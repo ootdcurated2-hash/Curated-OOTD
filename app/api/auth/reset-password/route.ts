@@ -109,13 +109,13 @@ async function sendResetEmail(
     });
 
     await transporter.sendMail({
-      from: `"Curated OOTD" <${GMAIL_USER}>`,
+      from: `"MY CURATED OOTD" <${GMAIL_USER}>`,
       to,
       subject: `${otp} adalah Kode Reset Kata Sandi Curated OOTD Anda`,
       html: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; border: 1px solid #fed7e2; border-radius: 16px; background-color: #fff;">
           <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #ff2b85; margin: 0; font-size: 24px; font-weight: 900;">Curated OOTD</h1>
+            <h1 style="color: #ff2b85; margin: 0; font-size: 24px; font-weight: 900;">MY CURATED OOTD</h1>
             <p style="color: #718096; font-size: 13px; margin-top: 4px;">Pusat Inspirasi Fashion &amp; Koleksi Gaya</p>
           </div>
           <p style="color: #2d3748; font-size: 14px; font-weight: 600;">Halo,</p>

@@ -258,14 +258,14 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href="mailto:qa.quran77@gmail.com"
+                    href="mailto:ootdcurated2@gmail.com"
                     className="inline-flex items-center gap-2 hover:text-primary transition-colors"
                   >
                     <svg className="h-4 w-4 text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect width="20" height="16" x="2" y="4" rx="2" />
                       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                     </svg>
-                    <span>qa.quran77@gmail.com</span>
+                    <span>ootdcurated2@gmail.com</span>
                   </a>
                 </li>
                 <li>
