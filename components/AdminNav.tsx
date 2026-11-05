@@ -11,6 +11,7 @@ import {
   FolderTree,
   BookOpen,
   MessageSquareQuote,
+  Users,
 } from "lucide-react";
 
 export default function AdminNav() {
@@ -47,6 +48,11 @@ export default function AdminNav() {
       href: "/admin/catatan",
       label: "Catatan",
       icon: MessageSquareQuote,
+    },
+    {
+      href: "/admin/users",
+      label: "Kelola User",
+      icon: Users,
     },
     {
       href: "/admin/settings",
